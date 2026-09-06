@@ -353,12 +353,21 @@ describe('WhoamiApp browser tests', () => {
         const authErrorEl = document.querySelector<HTMLElement>('.auth-error-text');
         expect(authErrorEl?.textContent).toContain('credentials are not valid');
 
-        // Sign in successfully
+        // Sign in successfully.
+        //
+        // **Poll rather than assert straight after the click**, because `userEvent.click` awaits the
+        // event dispatch and nothing more. Signing in is a fetch, and the handler resolves a turn or
+        // two later. Asserting immediately reads the state *before* the answer arrives.
+        //
+        // This is why the test passed alone and failed in the suite: alone the fetch resolved inside
+        // the click's own microtask drain, and under eleven files' worth of load it did not. The
+        // wrong-password branch above hid it — it asserts `signed-out`, which is also the state
+        // before anything happens, so a race there is invisible.
         await userEvent.clear(passwordInput);
         await userEvent.type(passwordInput, 'secret123');
         await userEvent.click(signinBtn);
 
-        expect(api.status()).toBe('signed-in');
+        await expect.poll(() => api.status()).toBe('signed-in');
         expect(api.displayName()).toBe('Alice Smith');
         expect(api.email()).toBe('alice@flybyme.dev');
 
@@ -369,7 +378,8 @@ describe('WhoamiApp browser tests', () => {
 
         await userEvent.click(signoutBtn);
 
-        expect(api.status()).toBe('signed-out');
+        // Same race as the sign-in above: revoking the ticket is a fetch.
+        await expect.poll(() => api.status()).toBe('signed-out');
         expect(api.user()).toBeNull();
 
         site.dispose();
@@ -403,7 +413,8 @@ describe('WhoamiApp browser tests', () => {
         mockMode = 'authenticated';
         await userEvent.click(retryBtn);
 
-        expect(api.status()).toBe('signed-in');
+        // Retry re-fetches the profile, so the same rule applies.
+        await expect.poll(() => api.status()).toBe('signed-in');
         expect(api.displayName()).toBe('Alice Smith');
 
         site.dispose();
