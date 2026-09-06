@@ -1,0 +1,87 @@
+Code lives in:  FLYBYME/mesh-demos — this worktree. All commits go here.
+
+================================================================================
+THE TASK
+================================================================================
+
+Write an Application that pushes the **window manager** hard:
+
+    src/workbench/index.ts   many views, opened many times, tiled and cascaded,
+                             persisted across reload
+
+Add it to `mesh.json` as `kind: "application"`, version `0.1.0`.
+
+This framework is an operating system in a browser, and the window manager is
+the part of it nothing has stressed. Today's todo app opened two windows and
+that is the deepest anything has gone.
+
+================================================================================
+WHAT TO EXERCISE, AND WHAT IS KNOWN BROKEN
+================================================================================
+
+Read `node_modules/@flybyme/mesh-web/src/window/` — `manager.ts`, `layout.ts`,
+`shell.ts`, `geometry.ts`, `page.ts` — and `spec/` alongside it.
+
+Things worth building the app around:
+
+- **N instances of one view.** The process table assigns a `pid`; one
+  Application can have many. Open the same view several times and keep them
+  distinct.
+- **Tiled and cascaded modes**, switched at run time. `windowMode` is a setting;
+  `policy` can lock it, which is how a blog is locked to one layout.
+- **Persistence.** `windowPersistence` restores geometry across reload. Check it
+  actually does.
+- **Focus, raise, minimize, maximize, resize, drag.**
+- **Keyboard.** `spec/input.md` §3: *every action has a non-pointer path*. If a
+  window can be closed by clicking, it must be closable without a mouse. Test
+  that claim and report where it fails.
+
+**Already known broken — confirm and report, do not fix in mesh-web:**
+
+`defaultFrame` (`src/window/shell.ts`) does not raise or focus a window on
+content pointerdown, only on titlebar drag. So a cascaded window sitting over
+another intercepts its pointer events and the background window's controls
+cannot be reached. This was found yesterday. Show it clearly, and say whether
+your app can work around it or whether it needs a kernel fix.
+
+================================================================================
+THE RULES
+================================================================================
+
+**Do not import another part's directory.** `src/shared/` only.
+
+**Do not patch mesh-web.** Known defects to work around: A7.0 (`Input` cannot be
+controlled — `value` goes through `setAttribute` and the dirty value flag
+ignores it), A7.0b (`activate` fires on Space), A5.7b (`cx.windows.open` inside
+`start()` renders against an undefined api — defer with `queueMicrotask`).
+
+**A view returns a description, never DOM.** No `document`, no refs. If the
+window manager seems to need one, read `spec/view-layer.md` again before
+reaching for an escape hatch — and if there genuinely is no way to express
+something, *that is the finding*.
+
+================================================================================
+WHAT GOOD LOOKS LIKE
+================================================================================
+
+- An app somebody would actually keep open: a workbench with several panels
+  that are useful side by side, not a test harness with buttons labelled "open
+  window 1".
+- Layout state that survives reload and is correct after it.
+- Tests that assert on the manager's own state, not only on the DOM.
+- `npm run typecheck` clean, zero casts. `npm run test:browser` green.
+- If a multi-window test needs an explicit focus call to beat the occlusion bug,
+  say so in a comment naming why — that comment is documentation of a defect.
+
+================================================================================
+YOUR REPORT
+================================================================================
+
+`agent-runs/results/4-window-workbench.result.md`:
+
+- what the window manager does well and what it cannot express
+- whether "every action has a non-pointer path" actually holds — name the ones
+  that fail
+- whether persistence restored what it claimed to
+- the occlusion bug: how bad is it in practice
+- every place the framework fought you, with file and line

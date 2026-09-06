@@ -1,0 +1,115 @@
+Code lives in:  FLYBYME/mesh-demos — this worktree. All commits go here.
+
+================================================================================
+THE TASK
+================================================================================
+
+Write an Application that **actually calls the platform**:
+
+    src/whoami/index.ts      shows who you are, which organizations you belong
+                             to, and lets you switch between them
+
+Add it to `mesh.json` as `kind: "application"`, version `0.1.0`.
+
+Every demo so far has `mesh: []` — nothing has ever called a real contract from
+a real page through a real gate. **The whole gate path is unexercised end to
+end**, and this dispatch is what exercises it.
+
+================================================================================
+THE PART DECLARES WHAT IT CALLS. IT NEVER CHOOSES ITS GATE.
+================================================================================
+
+This is the rule that matters and the easiest one to get wrong.
+
+In `mesh.json`, a part's `mesh` array declares the contracts it **calls**:
+
+    "mesh": [{
+        "package": "@flybyme/mesh-serve",
+        "version": "^0.1",
+        "contracts": ["identity.whoami"]
+    }]
+
+That is a *requirement*. It says "I call this." It does **not** say who may call
+it or at what gate — a site says that, in its own `mesh` list, with an `auth`
+level per contract. A part that could pick its own gate could grant itself
+anything.
+
+At compose time `checkComposition` refuses a release whose parts call something
+the site does not expose:
+
+    "This release calls identity.whoami and the site does not expose it."
+
+So your part declaring `identity.whoami` means the site must grant it. That is
+the mechanism working. Read `mesh-serve/src/cdn/methods/release.ts`.
+
+================================================================================
+HOW A CALL ACTUALLY HAPPENS
+================================================================================
+
+    cx.mesh.call(...)     the capability, from `needs('mesh')`
+
+An Application **never handles a credential.** `start.ts` installs
+`withHeaders(fetchTransport(api), () => credentials.headers())` and never looks
+through the seam; the auth Extension fills it in. Your app calls, and the
+request carries a ticket it has never seen. If you find yourself touching a
+token, you have gone wrong.
+
+Read, before writing:
+
+    node_modules/@flybyme/mesh-web/src/net/api.js and its .d.ts
+    node_modules/@flybyme/mesh-web/src/kernel/start.ts     the meshClient wiring
+    node_modules/@flybyme/mesh-web/src/auth/extension.ts   how auth provides it
+    ~/code/mesh-auth/src/extension.ts                      a real consumer
+    ~/code/mesh-serve/src/identity/contracts/identity.contract.ts
+
+`npm run generate` runs `mesh-serve client`, which generates typed bindings for
+the contracts your `mesh.json` declares. Use it — do not hand-write the types.
+mesh-auth's `src/generated/api.ts` is generated, not written, and that is why it
+cannot drift from the server.
+
+================================================================================
+WHAT HAPPENS WHEN IT IS NOT SIGNED IN
+================================================================================
+
+Most of the interesting behaviour. `identity.whoami` is gated `user`, so an
+anonymous caller is refused — and **a refusal is an answer, not an exception**.
+`makeHttp` in the kernel's broker returns status rather than throwing, on
+purpose. Handle it: show a signed-out state, not a crash and not a blank panel.
+
+The live cluster has an `auth` Extension published (`auth@0.2.0`) that owns
+sign-in. Your app should work whether or not it is composed alongside one —
+degrade, do not assume.
+
+================================================================================
+GO AND READ, DO NOT GUESS
+================================================================================
+
+    README.md in this repository — two parts, one repo, and the import rule
+    src/ — dispatches 1 and 2, merged. Read them before adding a third style.
+
+Known defects to work around, not fix (A7.0 `Input` cannot be controlled; A7.0b
+`activate` fires on Space; A5.7b `windows.open` inside `start()`). **Do not patch
+mesh-web.**
+
+================================================================================
+WHAT GOOD LOOKS LIKE
+================================================================================
+
+- A real call, typed end to end from a generated client, with no cast anywhere.
+- Signed-out, signed-in, and error states all handled and all visible.
+- Organization switching, if `whoami` returns more than one — read what it
+  actually returns rather than guessing the shape.
+- Tests that cover the refusal path, not only the happy one.
+- `npm run typecheck` clean, zero casts. `npm run test:browser` green.
+
+================================================================================
+YOUR REPORT
+================================================================================
+
+`agent-runs/results/3-mesh-api-client.result.md`:
+
+- what the call path was like to write **without ever seeing a credential**
+- whether the generated client was actually usable, or whether you wanted to
+  hand-write types
+- what a refusal looked like from inside the app, and whether it was legible
+- every place the framework fought you, with file and line

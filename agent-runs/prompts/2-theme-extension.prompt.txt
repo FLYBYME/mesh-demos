@@ -1,0 +1,101 @@
+Code lives in:  FLYBYME/mesh-demos — this worktree. All commits go here.
+
+================================================================================
+THE TASK
+================================================================================
+
+Write an **Extension** that provides something, and an **Application** that
+consumes it:
+
+    src/theme/index.ts       an Extension: theme tokens, light/dark/high-contrast,
+                             persisted, with a provider other parts can use
+    src/palette/index.ts     an Application that consumes the theme Extension:
+                             shows every token, lets you switch and edit them
+
+Add both to `mesh.json`. `kind` is `"extension"` for theme and `"application"`
+for palette. Version both `0.1.0`.
+
+Dispatch 1 wrote two Applications that ignore each other. **This one is the pair
+that talks** — and the provider graph across two artifacts has never been
+exercised by anything except the framework's own tests.
+
+================================================================================
+WHY THIS IS THE INTERESTING ONE
+================================================================================
+
+`theme` and `palette` become **two separate artifacts**. A site can compose
+palette with theme, or theme alone, or — and this is the case that must fail
+cleanly — palette *without* theme.
+
+So this is not an import. It is the provider graph:
+
+- the Extension declares `provides` with a `ProviderToken`
+- the Application declares `consumes` naming that token
+- the Application reaches it with `cx.use(TOKEN)`
+- the kernel resolves Extensions before Applications, in dependency order
+
+Read `spec/kernel.md` §4 and `src/contribution/provider.ts` before writing a
+line of it.
+
+**The token has to live somewhere both can import.** Put it in `src/shared/`.
+That is source copied into both artifacts, not a runtime dependency — a token is
+identified by its string id, so two copies of the same declaration resolve to
+the same token. If that turns out not to be true, **that is a finding and it is
+a big one**: write it up rather than working around it.
+
+`mesh.json` has a `requiredParts` field on each part. Use it on palette to say
+it needs theme. Read how `checkComposition` in mesh-serve treats it — required
+versus optional is a real distinction there.
+
+================================================================================
+THE RULE
+================================================================================
+
+**Neither part may import the other's directory.** `src/palette/` may not import
+`src/theme/`. Only `src/shared/` is common ground. Two artifacts, deployable
+separately — an import between them is a dependency the release checker cannot
+see.
+
+================================================================================
+GO AND READ, DO NOT GUESS
+================================================================================
+
+    node_modules/@flybyme/mesh-web/spec/kernel.md          §4 capabilities, §3 boot
+    node_modules/@flybyme/mesh-web/spec/application.md
+    node_modules/@flybyme/mesh-web/src/contribution/provider.ts
+    node_modules/@flybyme/mesh-web/src/contribution/contract.ts
+    README.md in this repository
+    src/ — dispatch 1's two Applications, already merged. Read them.
+
+Known defects to work around, not fix (mesh-web roadmap A7.0, A7.0b, A5.7b):
+`Input` cannot be controlled — `value` goes through `setAttribute` and the dirty
+value flag ignores it; `activate` fires on Space so it cannot go on a text field;
+`cx.windows.open` inside `start()` renders against an undefined api, defer with
+`queueMicrotask`. **Do not patch mesh-web.** Work around, and report.
+
+================================================================================
+WHAT GOOD LOOKS LIKE
+================================================================================
+
+- The theme Extension actually restyles the page — the kernel's stylesheet reads
+  `var(--surface)`, `var(--ink)`, `var(--edge)`, `var(--accent)` and friends
+  with fallbacks. Setting those tokens is the whole mechanism. Read
+  `node_modules/@flybyme/mesh-web/src/kernel.css` and drive it.
+- Persistence through the `storage` capability, not `localStorage` directly.
+- **A test that palette fails cleanly when theme is absent.** A missing provider
+  must be a legible error, not a crash — check what actually happens and report
+  it either way.
+- `npm run typecheck` clean, zero casts.
+- `npm run test:browser` green.
+
+================================================================================
+YOUR REPORT
+================================================================================
+
+`agent-runs/results/2-theme-extension.result.md`:
+
+- how the provider graph behaved across two artifacts
+- **whether a shared token in `src/shared/` really did resolve** — this is the
+  load-bearing assumption
+- what happens when a consumer's provider is missing
+- every place the framework fought you, with file and line

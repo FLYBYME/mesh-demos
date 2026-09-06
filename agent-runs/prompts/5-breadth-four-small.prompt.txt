@@ -1,0 +1,92 @@
+Code lives in:  FLYBYME/mesh-demos — this worktree. All commits go here.
+
+================================================================================
+THE TASK
+================================================================================
+
+Write **four small Applications**, each in its own directory:
+
+    src/calc/index.ts        a calculator: keypad, history, keyboard input
+    src/markdown/index.ts    a markdown viewer: type on the left, render right
+    src/kanban/index.ts      a board: columns, cards, drag between columns
+    src/chart/index.ts       a chart: enter numbers, see bars, pick a series
+
+All four to `mesh.json`, `kind: "application"`, version `0.1.0`.
+
+Dispatches 1–4 went deep on specific mechanisms. **This one goes wide**: four
+different shapes of app over one small component vocabulary, to find out where
+that vocabulary runs out.
+
+================================================================================
+THE POINT IS THE VOCABULARY
+================================================================================
+
+There are eleven primitives — `Stack`, `Row`, `Text`, `Heading`, `Button`,
+`Input`, `Form`, `List`, `ListItem`, `Card`, `Badge` — and
+`src/render/component.ts` says plainly that they are *"a first cut, not the
+audit"*, expected to change.
+
+**These four apps are the audit.** A calculator wants a grid. A markdown viewer
+wants a scroll region and a text area. A board wants drag and drop between
+containers. A chart wants something the vocabulary almost certainly cannot
+express at all.
+
+So the deliverable is as much the list of what is missing as the apps:
+
+- **What could not be expressed** — name it precisely, and say what you did
+  instead. "A chart needs a canvas or an SVG and there is neither" is a finding,
+  not a failure.
+- **What you had to abuse** — a `Stack` doing a grid's job, a `Badge` used as a
+  cell.
+- **What was awkward but possible** — the difference between missing and clumsy
+  matters for the audit.
+
+`element('div', …)` throws by name at render time. That refusal is deliberate:
+if an app cannot be written without a raw tag, the *library* is wrong, and
+naming it is the job. Do not look for an escape hatch. There is a planned one —
+A7.5, the `dom` capability and `Surface` — and it does not exist yet. Say where
+you would have wanted it.
+
+================================================================================
+THE RULES
+================================================================================
+
+**No part imports another part's directory.** `src/shared/` only, and think
+before putting anything there — four apps sharing a helper is fine, four apps
+sharing state is a design error.
+
+**Do not patch mesh-web.** Work around and report: A7.0 (`Input` cannot be
+controlled — `value` goes through `setAttribute`, dirty value flag ignores it;
+key it inside an `each` on a revision counter), A7.0b (`activate` fires on Space
+so it cannot go on a text field — use `commit` on a `Form`), A5.7b
+(`cx.windows.open` inside `start()` — defer with `queueMicrotask`).
+
+**Zero casts.** No `as any`, no `as never`. This framework exists because its
+author almost rewrote MoleculerJS for type safety.
+
+================================================================================
+WHAT GOOD LOOKS LIKE
+================================================================================
+
+- Four apps that work, not four sketches. Small is fine; broken is not.
+- Keyboard paths throughout — `spec/input.md` §3, every action reachable
+  without a pointer. The calculator especially.
+- Tests per app.
+- `npm run typecheck` clean. `npm run test:browser` green.
+
+================================================================================
+YOUR REPORT
+================================================================================
+
+`agent-runs/results/5-breadth-four-small.result.md`:
+
+**Lead with the vocabulary audit** — this is the most valuable thing in the
+dispatch:
+
+- what could not be expressed at all
+- what needed a primitive that does not exist, and what that primitive is
+- what you abused, and what it should have been
+- where you wanted `Surface` / a raw DOM escape hatch, and for what
+
+Then the ordinary report: what each app does, and every place the framework
+fought you, with file and line.

@@ -1,0 +1,113 @@
+Code lives in:  FLYBYME/mesh-demos — this worktree. All commits go here.
+
+================================================================================
+THE TASK
+================================================================================
+
+Write **two Applications** for the mesh-web framework, in one repository:
+
+    src/clock/index.ts      a clock: current time, a stopwatch, a countdown
+    src/notes/index.ts      a note list: write, edit, delete, filter by text
+
+`src/` is empty apart from this. The scaffolding — package.json, tsconfig,
+vitest config — is done and works.
+
+**Two parts, one repository, is the point of this dispatch.** Read README.md
+first: `mesh.json` has a `parts` array, each entry becomes its own catalog row
+and its own artifact, and nothing about sharing a git repository ties them
+together. You are the first thing to exercise that, so if it is wrong, you will
+be the one who finds out.
+
+Add both to `mesh.json` when you write them. Version both `0.1.0`. `kind` is
+`"application"` for both, `entry` is `src/clock/index.ts` and
+`src/notes/index.ts`.
+
+================================================================================
+THE RULE THAT MATTERS MOST HERE
+================================================================================
+
+**Neither part may import the other.** Not for a type, not for a helper, not for
+a constant. They are two artifacts that may be deployed separately, at different
+versions, on different hostnames — so an import between them is a dependency the
+composition cannot see and the release checker cannot refuse. It would work in
+your tests and break on a real page.
+
+If they genuinely need to share something, put it in `src/shared/` and let both
+import that. It is copied into both artifacts, which is correct: it is source,
+not a part.
+
+================================================================================
+WHAT AN APPLICATION IS HERE — GO AND READ, DO NOT GUESS
+================================================================================
+
+Everything is in `node_modules/@flybyme/mesh-web`, installed, with its `spec/`:
+
+    spec/application.md    what an Application is and what it declares
+    spec/view-layer.md     views return a *description*, never DOM
+    spec/kernel.md §4      capabilities: what a contribution may reach
+    src/contribution/contract.ts    the actual types — Application, ViewDecl
+    src/render/component.ts         the primitives you may use
+
+Three things that are not like other frameworks:
+
+**A view returns data.** `render(vx)` returns a description node, not DOM and not
+JSX. There is no `document`, no element, no ref. If you want one, you have
+misread the layer.
+
+**Your vocabulary is components, never tags.** `Stack`, `Row`, `Text`,
+`Heading`, `Button`, `Input`, `Form`, `List`, `ListItem`, `Card`, `Badge`.
+`element('div', …)` throws by name at render time — the registry refuses it.
+
+**Reactivity is signals.** `signal`, `computed`, `effect`, `each`, `when`. A
+view is described once and updates by signal, not by re-running render.
+
+================================================================================
+KNOWN FRAMEWORK DEFECTS — WORK AROUND THEM, DO NOT FIX THEM
+================================================================================
+
+These are real, found yesterday by the first Application written against this
+framework. They are logged in mesh-web's roadmap. **Do not patch mesh-web** —
+this dispatch stays in this repository. Work around them and say so.
+
+**A7.0 — `Input` cannot be controlled.** `PRIMITIVES` has `tag('Input','input')`
+with no `apply`, so `value` goes through `setAttribute`, which the DOM's dirty
+value flag ignores once a user has typed. `props: { value: () => draft() }`
+fails *silently* — the text stays in the box after you submit. The known
+workaround is to wrap the Input in a keyed `each` over a revision counter and
+bump the counter to force a fresh DOM node.
+
+**A7.0b — `activate` fires on Space.** `bindIntents` binds `activate` to Enter
+*and* Space, so it cannot go on a text field — pressing space mid-word runs the
+command. Put `commit` on an enclosing `Form` instead.
+
+**A5.7b — `cx.windows.open` during `start()` crashes the view.** `entry.api` is
+assigned *after* the await in `kernel.start`, so a view opened synchronously
+inside `start()` renders against an undefined api. Defer with `queueMicrotask`.
+
+If you hit a *new* one, that is the most valuable thing you can produce. Work
+around it, and write it up precisely: what you expected, what happened, the file
+and line, and what you did instead.
+
+================================================================================
+WHAT GOOD LOOKS LIKE
+================================================================================
+
+- Both apps genuinely usable, not sketches. A clock that only shows the time is
+  not worth an artifact; give it the stopwatch and the countdown.
+- Several views each, so there is something to open in more than one window.
+- `npm run typecheck` clean. **Zero `as any`, zero `as never`, zero casts.**
+  This framework exists because its author almost rewrote MoleculerJS for type
+  safety — a cast here is a bug, not a style question.
+- `npm run test:browser` green: real browser tests via `mountPart`, per part.
+- Commit as you go, small commits with real messages.
+
+================================================================================
+YOUR REPORT
+================================================================================
+
+Write `agent-runs/results/1-clock-and-notes.result.md`:
+
+- what each app does
+- **every place the framework fought you** — the whole point of this exercise
+- anything about two-parts-in-one-repo that did not work as README.md claims
+- what you would change about the framework, with file and line
