@@ -237,9 +237,24 @@ describe('Workbench Application browser tests', () => {
             parts: [{ id: 'workbench', contribution: WorkbenchApp }],
         });
 
-        // In mesh-web v0.6.3 start.ts, windowPersistence return value was discarded without calling restore().
-        // Consequently, the manager's live mode defaults to 'windowed' until persistence.restore() is run.
-        expect(site.manager.mode()).toBe('windowed');
+        /**
+         * **The policy reaches the manager, and this assertion used to say the opposite.**
+         *
+         * It read `expect(site.manager.mode()).toBe('windowed')`, with a comment explaining that
+         * v0.6.3's `start.ts` discarded `windowPersistence()`'s return value without calling
+         * `restore()`, so a locked mode never arrived. That was a **kernel bug**, and the test wrote
+         * it down as the expected result — so the test would have stayed green for as long as the
+         * bug lived, and went red the moment it was fixed.
+         *
+         * The kernel now watches persistence, so a build policy of `tiled` is the live mode from the
+         * first paint. Which is the whole claim `registry/hives.ts` makes about a locked deployment:
+         * *the window manager reads a setting, and the setting happens to be one nobody can change.*
+         *
+         * Third time in this repository a test has encoded a defect as intent. Worth remembering the
+         * shape: an assertion whose comment explains *why the wrong thing happens* is not a test, it
+         * is a bug report someone made permanent.
+         */
+        expect(site.manager.mode()).toBe('tiled');
 
         // The policy is locked in the settings registry
         const mode = windowMode('workbench');

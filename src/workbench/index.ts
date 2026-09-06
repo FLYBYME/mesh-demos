@@ -18,6 +18,7 @@ import {
     type ProviderToken,
     type Signal,
     type ViewContext,
+    type WindowMode,
     type ViewDecl,
 } from '@flybyme/mesh-web';
 
@@ -67,9 +68,9 @@ export interface WorkbenchApi {
     runTerminalCommand(session: string, cmd: string): void;
     clearTerminal(session: string): void;
 
-    setMode(mode: 'windowed' | 'tiled'): void;
+    setMode(mode: WindowMode): void;
     toggleMode(): void;
-    getMode(): 'windowed' | 'tiled';
+    getMode(): WindowMode;
 
     windows(): readonly ChromeWindow[];
     focusedWindowId(): string | undefined;
@@ -1696,7 +1697,7 @@ export default class WorkbenchApp implements Application<typeof NEEDS, readonly 
             logEvent(`Terminal [${session}] cleared`);
         };
 
-        const setMode = (mode: 'windowed' | 'tiled'): void => {
+        const setMode = (mode: WindowMode): void => {
             cx.chrome.setMode(mode);
             logEvent(`Switched mode to "${mode}"`);
         };
@@ -1706,7 +1707,7 @@ export default class WorkbenchApp implements Application<typeof NEEDS, readonly 
             setMode(next);
         };
 
-        const getMode = (): 'windowed' | 'tiled' => cx.chrome.mode();
+        const getMode = (): WindowMode => cx.chrome.mode();
 
         const windows = (): readonly ChromeWindow[] => cx.chrome.windows();
 
