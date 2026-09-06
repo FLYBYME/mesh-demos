@@ -45,6 +45,12 @@
                     "version": "^0.1.0"
                 }
             ]
+        },
+        {
+            "kind": "application",
+            "id": "workbench",
+            "version": "0.1.0",
+            "entry": "src/workbench/index.ts"
         }
     ]
 }
