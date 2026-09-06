@@ -1,4 +1,17 @@
 {
     "kernel": "^0.6",
-    "parts": []
+    "parts": [
+        {
+            "kind": "application",
+            "id": "clock",
+            "version": "0.1.0",
+            "entry": "src/clock/index.ts"
+        },
+        {
+            "kind": "application",
+            "id": "notes",
+            "version": "0.1.0",
+            "entry": "src/notes/index.ts"
+        }
+    ]
 }
