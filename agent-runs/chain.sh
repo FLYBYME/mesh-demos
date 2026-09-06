@@ -4,9 +4,18 @@
 #   cd ~/code/mesh-demos && nohup agent-runs/chain.sh 1 5 > chain.log 2>&1 &
 #
 # For each N: wait for the running dispatch to finish, verify and merge it with
-# finish.sh, then dispatch N+1. One agy at a time, by construction -- the wait is
-# on `pgrep agy` going to zero, so a second slot running in *another* repository
-# is unaffected.
+# finish.sh, then dispatch N+1.
+#
+# WHY IT WAITS ON A WORKTREE AND NOT ON `pgrep agy`
+#
+# The first version of this waited for the global agy count to reach zero. That
+# is wrong the moment a second slot is running in another repository: the count
+# never reaches zero, so this chain blocks on a dispatch that has nothing to do
+# with it, and the two slots serialise into one.
+#
+# So the wait is on *this* dispatch's worktree -- an agy whose cwd is under it,
+# found through /proc/PID/cwd. Precise, and it makes the two slots genuinely
+# independent, which is the whole reason there are two.
 #
 # WHY IT MERGES BETWEEN EACH RATHER THAN AT THE END
 #
@@ -35,11 +44,20 @@ say() { printf '\n=== [chain %s] %s\n' "$(date +%H:%M:%S)" "$*"; }
 # The result file for N, whatever it is called.
 result_of() { find "$ROOT/agent-runs/results" -name "$1-*.result.md" -print -quit 2>/dev/null; }
 
+# Is an agy running inside this worktree? Asked of /proc rather than of a pidfile,
+# so it stays true if agy re-execs and false the moment it is gone.
+agy_in() {
+    local tree="$1" pid cwd
+    for pid in $(pgrep -f '^agy ' 2>/dev/null); do
+        cwd="$(readlink -f "/proc/$pid/cwd" 2>/dev/null || true)"
+        case "$cwd" in "$tree"|"$tree"/*) return 0 ;; esac
+    done
+    return 1
+}
+
 wait_for_agy() {
-    # Both conditions, because either alone is wrong: a result file appears
-    # slightly before the process exits, and a crashed agy writes no file at all.
-    local waited=0
-    while [ "$(pgrep -cf '^agy ' || echo 0)" != "0" ]; do
+    local tree="$1" waited=0
+    while agy_in "$tree"; do
         sleep 30
         waited=$((waited + 30))
         if [ "$waited" -ge 5400 ]; then
@@ -51,15 +69,17 @@ wait_for_agy() {
 }
 
 for N in $(seq "$FIRST" "$LAST"); do
-    if [ "$(pgrep -cf '^agy ' || echo 0)" = "0" ] && [ ! -d "$ROOT/../$(basename "$ROOT")-dispatch-$N" ]; then
+    TREE="$(dirname "$ROOT")/$(basename "$ROOT")-dispatch-$N"
+
+    if agy_in "$TREE"; then
+        say "$N is already running; waiting on it"
+    else
         say "dispatching $N"
         (cd "$ROOT" && "$DISPATCH" "$N") || { say "dispatch $N failed to start"; exit 1; }
-        sleep 10
-    else
-        say "$N is already running; waiting on it"
+        sleep 15
     fi
 
-    wait_for_agy || exit 1
+    wait_for_agy "$TREE" || exit 1
 
     r="$(result_of "$N")"
     say "dispatch $N finished. Result: ${r:-none written}"
