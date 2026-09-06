@@ -14,25 +14,53 @@
                         "identity.whoami"
                     ]
                 }
-            ]
+            ],
+            "description": "Who you are signed in as, and which organizations you belong to.",
+            "keywords": [
+                "identity",
+                "account"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         },
         {
             "kind": "application",
             "id": "clock",
             "version": "0.1.0",
-            "entry": "src/clock/index.ts"
+            "entry": "src/clock/index.ts",
+            "description": "A clock, a stopwatch and a countdown timer.",
+            "keywords": [
+                "time",
+                "utility"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         },
         {
             "kind": "application",
             "id": "notes",
             "version": "0.1.0",
-            "entry": "src/notes/index.ts"
+            "entry": "src/notes/index.ts",
+            "description": "Write, edit, search and delete notes.",
+            "keywords": [
+                "notes",
+                "writing"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         },
         {
             "kind": "extension",
             "id": "theme",
             "version": "0.1.0",
-            "entry": "src/theme/index.ts"
+            "entry": "src/theme/index.ts",
+            "description": "Theme tokens for every part on the page: light, dark and high contrast.",
+            "keywords": [
+                "theme",
+                "appearance"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         },
         {
             "kind": "application",
@@ -44,37 +72,79 @@
                     "id": "theme",
                     "version": "^0.1.0"
                 }
-            ]
+            ],
+            "description": "Inspect and edit every theme token live.",
+            "keywords": [
+                "theme",
+                "developer"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         },
         {
             "kind": "application",
             "id": "workbench",
             "version": "0.1.0",
-            "entry": "src/workbench/index.ts"
+            "entry": "src/workbench/index.ts",
+            "description": "Many panels at once: tiled, cascaded, and remembered across reloads.",
+            "keywords": [
+                "windows",
+                "developer"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         },
         {
             "kind": "application",
             "id": "calc",
             "version": "0.1.0",
-            "entry": "src/calc/index.ts"
+            "entry": "src/calc/index.ts",
+            "description": "A calculator with a keypad, a formula bar and history.",
+            "keywords": [
+                "maths",
+                "utility"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         },
         {
             "kind": "application",
             "id": "markdown",
             "version": "0.1.0",
-            "entry": "src/markdown/index.ts"
+            "entry": "src/markdown/index.ts",
+            "description": "Write markdown on the left, see it rendered on the right.",
+            "keywords": [
+                "writing",
+                "markdown"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         },
         {
             "kind": "application",
             "id": "kanban",
             "version": "0.1.0",
-            "entry": "src/kanban/index.ts"
+            "entry": "src/kanban/index.ts",
+            "description": "A board of columns and cards you can move between them.",
+            "keywords": [
+                "tasks",
+                "planning"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         },
         {
             "kind": "application",
             "id": "chart",
             "version": "0.1.0",
-            "entry": "src/chart/index.ts"
+            "entry": "src/chart/index.ts",
+            "description": "Enter numbers, see bars. Multiple series, switchable projections.",
+            "keywords": [
+                "data",
+                "charts"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         }
     ]
 }
