@@ -12,6 +12,24 @@
             "id": "notes",
             "version": "0.1.0",
             "entry": "src/notes/index.ts"
+        },
+        {
+            "kind": "extension",
+            "id": "theme",
+            "version": "0.1.0",
+            "entry": "src/theme/index.ts"
+        },
+        {
+            "kind": "application",
+            "id": "palette",
+            "version": "0.1.0",
+            "entry": "src/palette/index.ts",
+            "requiredParts": [
+                {
+                    "id": "theme",
+                    "version": "^0.1.0"
+                }
+            ]
         }
     ]
 }
