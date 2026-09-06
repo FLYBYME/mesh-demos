@@ -51,6 +51,30 @@
             "id": "workbench",
             "version": "0.1.0",
             "entry": "src/workbench/index.ts"
+        },
+        {
+            "kind": "application",
+            "id": "calc",
+            "version": "0.1.0",
+            "entry": "src/calc/index.ts"
+        },
+        {
+            "kind": "application",
+            "id": "markdown",
+            "version": "0.1.0",
+            "entry": "src/markdown/index.ts"
+        },
+        {
+            "kind": "application",
+            "id": "kanban",
+            "version": "0.1.0",
+            "entry": "src/kanban/index.ts"
+        },
+        {
+            "kind": "application",
+            "id": "chart",
+            "version": "0.1.0",
+            "entry": "src/chart/index.ts"
         }
     ]
 }
