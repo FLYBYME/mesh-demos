@@ -1,0 +1,155 @@
+Code lives in:  FLYBYME/mesh-demos — this worktree. All commits go here.
+
+================================================================================
+BEFORE YOU START — CHECK THE GATE
+================================================================================
+
+This dispatch is gated on **mesh-web 0.7.0**, which fixes A7.0, A7.0b and A5.7b.
+
+    node -p "require('./node_modules/@flybyme/mesh-web/package.json').version"
+
+If that is **not** 0.7.0 or later, stop. Write
+`agent-runs/results/6-split-and-unwork-around.result.md` saying the kernel is
+still at whatever it is, do nothing else, and exit. Half of this task is
+deleting workarounds for defects that would still be real.
+
+If it *is* 0.7.0+, read `spec/roadmap.md` in `node_modules/@flybyme/mesh-web` to
+confirm A7.0, A7.0b and A5.7b are ticked, then continue.
+
+================================================================================
+THE TASK — TWO HALVES
+================================================================================
+
+**Half one: split every part that has outgrown one file, by feature.**
+
+**Half two: delete every workaround for a defect that is now fixed.**
+
+Do them in that order and commit them separately. A refactor and a behaviour
+change in one commit is a diff nobody can review.
+
+================================================================================
+HALF ONE — SPLIT BY FEATURE, NOT BY LAYER
+================================================================================
+
+`src/clock/index.ts` is 918 lines and `src/notes/index.ts` is 844. Later
+dispatches may have added more; check every part and apply the same judgement.
+A part under ~300 lines is fine as one file — do not split for the sake of it.
+
+Take `clock` as the worked example. **It is not one long file. It is three
+features in a trench coat**, and the file says so itself:
+
+- `ClockApi` is commented into three blocks: `// Current time`, `// Stopwatch`,
+  `// Countdown`
+- `start()` has the same three blocks
+- three `private intervalId` fields
+- three view functions
+- **every formatter is used by exactly one feature.** `formatTime`,
+  `formatDate`, `formatTimezone` only in the time block; `formatStopwatch` only
+  in the stopwatch block; `formatCountdown` only in the countdown block. Zero
+  overlap.
+
+That last point is the argument. The existing `// formatting` section groups by
+*what kind of function something is* rather than by *what it belongs to*, and
+that is the layer split in miniature.
+
+**So do not split into `types.ts` / `format.ts` / `views/` / `index.ts`.** It is
+the obvious split and it is the worse one: `start()` would still be ~290 lines
+containing three interleaved state machines, and the countdown's formatter,
+state, view and commands — four things that only ever change together — would
+end up in four different files.
+
+Split like this:
+
+    src/clock/
+      index.ts          the Application: declares, composes, delegates
+      api.ts            LapItem, ClockApi, CLOCK token, NEEDS
+      features/
+        time.ts         formatters + state + view + commands + dispose
+        stopwatch.ts    ditto
+        countdown.ts    ditto
+
+Each feature module exports one shape — adapt the names, keep the idea:
+
+    export const timeCommands: readonly CommandDecl[] = [ … ];
+    export const timeView: ViewDecl< … >;
+    export function startTime(cx: Context< … >): {
+        api: TimeApi;
+        dispose(): void;
+    };
+
+`index.ts` becomes nearly declarative: `commands` is three spreads, `views` is
+three entries, and `start()` calls three factories and merges three API slices.
+
+**Disposal should stop being manual.** Today three interval ids are tracked as
+private fields and cleared in a cleanup block. If each feature returns its own
+`dispose()`, the Application holds an array and calls them — and a fourth
+feature cannot forget, because the type will not let it.
+
+Apply the same reasoning to `notes` and to anything else oversized. The features
+there are different — list/filter, editor, stats — so think rather than copy the
+shape. If a part genuinely is one feature and is merely long, say so and leave
+it.
+
+**Do not put any of this in `src/shared/`.** These are one part's internals.
+`src/shared/` is only for what two *parts* genuinely both need.
+
+================================================================================
+HALF TWO — DELETE THE WORKAROUNDS
+================================================================================
+
+Every part in this repository was written against a kernel with three known
+defects and told to work around them. Those workarounds are now debt. Find and
+remove all of them, in every part.
+
+**A7.0 — the keyed-input revision counter.** Parts wrap an `Input` in a keyed
+`each` over a revision counter and bump it to force a fresh DOM node, because
+`value` went through `setAttribute` and the dirty value flag ignored it. With
+0.7.0 a plain controlled input works. Delete the `each`, delete the counter, and
+**delete it from the public API** — `ClockApi.countdownInputRevision` is a
+workaround that leaked into an interface, and it is not a clock concept.
+
+**A7.0b — `commit` on an enclosing `Form` to dodge Space.** Where a `Form` was
+wrapped around an input purely because `activate` fired on Space, and the form
+is not otherwise a form, put the intent back where it belongs. Where the `Form`
+is genuinely a form, leave it — a form that submits is correct regardless.
+
+**A5.7b — `queueMicrotask` around `cx.windows.open`.** Parts defer their initial
+`windows.open` because `entry.api` was assigned after the await. Read what
+0.7.0 actually did before you touch this: if it held view mounting until
+`running`, the defer is now unnecessary; if it made the api available eagerly,
+the same. Either way the `queueMicrotask` and the comment explaining it go.
+
+**Every deletion needs its test to still pass.** If removing a workaround breaks
+a test, that is the most interesting possible outcome — it means 0.7.0 did not
+fix what it claimed. Do not paper over it. Stop, and write up exactly what you
+saw.
+
+================================================================================
+WHAT GOOD LOOKS LIKE
+================================================================================
+
+- **The split changes no behaviour.** Every existing test passes untouched. If
+  you find yourself editing a test to make the refactor work, the refactor is
+  wrong — a test that breaks on a pure move is telling you the move was not pure.
+- Bump `mesh-web` to `^0.7` in `mesh.json`, and the pinned version in
+  `package.json`. Bump every part's own version to `0.2.0`: the artifacts change.
+- `npm run typecheck` clean. **Zero `as any`, zero `as never`, zero casts.**
+- `npm run test:browser` green.
+- Two commits minimum, and more is better: the split, then the workaround
+  removal. Never one commit doing both.
+
+================================================================================
+YOUR REPORT
+================================================================================
+
+`agent-runs/reports/6-split-and-unwork-around.md`  ← note: `reports/`, and
+committed. `agent-runs/results/` is gitignored and is destroyed with the
+worktree; dispatch 1's detailed report was lost that way.
+
+- which parts you split and which you left alone, and why for each
+- what the feature boundaries turned out to be in `notes` — they were not
+  obvious from outside
+- **every workaround you removed, and confirmation its test still passes**
+- anything 0.7.0 claims to have fixed that you found still broken
+- whether the resulting `index.ts` files actually read as declarations, or
+  whether composing three features turned out to have its own cost
