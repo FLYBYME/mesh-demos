@@ -3,6 +3,21 @@
     "parts": [
         {
             "kind": "application",
+            "id": "whoami",
+            "version": "0.1.0",
+            "entry": "src/whoami/index.ts",
+            "mesh": [
+                {
+                    "package": "@flybyme/mesh-serve",
+                    "version": "^0.1",
+                    "contracts": [
+                        "identity.whoami"
+                    ]
+                }
+            ]
+        },
+        {
+            "kind": "application",
             "id": "clock",
             "version": "0.1.0",
             "entry": "src/clock/index.ts"
