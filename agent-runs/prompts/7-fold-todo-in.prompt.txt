@@ -1,0 +1,91 @@
+Code lives in:  FLYBYME/mesh-demos — this worktree. All commits go here.
+
+================================================================================
+THE TASK
+================================================================================
+
+**Fold the `todo` Application into this repository.**
+
+`mesh-todo` is a whole repository containing one Application — 460 lines of
+source and a 229-line browser test. The decision (project owner, 2026-09-06) is
+that demo applications live here, beside the other eleven. A repository per app
+was the right shape when one repository could hold only one part; `mesh.json`'s
+`parts` array removed that constraint, and this is the cleanup.
+
+Safe to do because `partVersion.repository` is recorded per version, so a part
+changing repositories does not orphan versions published from the old one.
+
+**`todo` is live on `todo.localhost`.** You are not deploying anything —
+publishing and recomposing happen outside this dispatch, by hand, against the
+live node. It is why the bar is high.
+
+================================================================================
+WHAT MOVES
+================================================================================
+
+From `~/code/mesh-todo` (read it, do not edit it — a different repository):
+
+    src/index.ts              ->  src/todo/index.ts
+    test/todo.browser.test.ts ->  test/todo.browser.test.ts
+
+This repository's layout is `src/<part>/index.ts` — eleven examples already.
+Add the twelfth entry to `mesh.json` in the shape the others use, **including
+`description`, `keywords`, `license` and `homepage`**, which mesh-todo's entry
+lacks. The catalog reads those now, and "Describe every part" (commit `6bc7042`)
+did this for the existing eleven; todo is the one that missed it because it lived
+elsewhere.
+
+**The kernels already match** — mesh-todo declares `^0.6` against mesh-web 0.6.2,
+this repository declares `^0.6` against `#v0.6.3`. So this is a move, not an
+upgrade, and if it turns into an upgrade something is wrong: stop and report it.
+
+`mesh` is `[]` in mesh-todo's entry — todo calls no site contracts, it is
+storage-only. Keep it that way; do not give it contracts it does not use.
+
+================================================================================
+WHAT NOT TO DO
+================================================================================
+
+**Do not edit `~/code/mesh-todo`.** Read-only; archived after this lands.
+
+**Do not publish, compose or deploy.** No `mesh-serve publish`, no `cdn.compose`.
+
+**Do not "improve" the todo app.** Not its styling, not its storage shape, not
+its component structure. A move whose diff is a move can be verified by reading
+it; a move mixed with a rewrite cannot, and this one is live.
+
+**Do not touch the other eleven parts.** There is an unrun dispatch 6 in this
+repository that splits oversized parts and strips kernel workarounds — that is
+its job, not this one's, and overlapping edits would collide.
+
+**Zero `as any`, zero `as never`, zero casts.**
+
+================================================================================
+WHAT GOOD LOOKS LIKE
+================================================================================
+
+- `src/todo/index.ts` exists, `mesh.json` has twelve parts, the twelfth fully
+  described.
+- mesh-todo's browser test moved and passing, and **every existing test in this
+  repository still passing** — the eleven other parts must be untouched.
+- `npm run typecheck` clean. `npm test` green.
+- `todo` bumped to **0.2.0** in `mesh.json`: new repository. Not 0.1.1 — the
+  version is what a site resolves to, and a repository change is worth a minor.
+- `git diff` for `src/todo/index.ts` against mesh-todo's copy is **empty apart
+  from nothing at all**. If you changed a line, say which and why in the report.
+
+================================================================================
+YOUR REPORT
+================================================================================
+
+`agent-runs/reports/7-fold-todo-in.md`
+
+- whether the move was byte-identical, and every line that was not
+- what has to happen for `todo.localhost` to move from `todo@0.1.0` to `0.2.0`
+- whether `mesh-todo` can be archived immediately, or whether something still
+  reads it — the catalog records it as `partVersion.repository` for the published
+  version, and C6 rebuilds a lost artifact by cloning exactly that
+- whether folding twelve parts into one repository is starting to strain
+  anything: build time, test time, the `mesh.json` file itself. You are the first
+  to see it at twelve, and the answer decides whether this consolidation
+  continues or stops here.
