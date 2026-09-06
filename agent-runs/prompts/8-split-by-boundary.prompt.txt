@@ -1,0 +1,132 @@
+Code lives in:  FLYBYME/mesh-demos — this worktree. All commits go here.
+
+================================================================================
+THE TASK
+================================================================================
+
+**Split all eleven parts into the file structure the project decided on.**
+Structure and reasoning: `~/code/surfdns/architecture/boundaries.md` — read it
+first, it is short and it is the specification for this dispatch.
+
+Every part here is one file, 460 to 1,896 lines:
+
+    workbench 1896   whoami 1082   kanban 1076   calc 1000   markdown 966
+    chart 943        clock 918     notes 844     palette 777   todo 460
+    theme 203        shared 116
+
+**They are not disorganised.** Every one already carries the same four banner
+comments:
+
+    types & contract  →  helpers  →  views  →  application
+
+The sections are already right. They are just all in one file, and **views are
+most of it** — calc is 467 view lines of 1,000, workbench 1,195 of 1,896. So this
+is not a redesign. It is honouring seams the code already draws.
+
+================================================================================
+THE SHAPE
+================================================================================
+
+    src/<part>/
+        contract.ts       the token, the API interface, NEEDS, CONSUMES
+        <pure>.ts         logic with no kernel import — math.ts, parse.ts, sort.ts
+        views/
+            <view>.ts     one view per file
+        index.ts          the Application or Extension class, and the default export
+
+Four rules, each checkable rather than aspirational:
+
+1. **`contract.ts` imports nothing from its siblings.** It is a leaf of the module
+   graph, and being a leaf is exactly what makes it safe for another part to
+   import. A contract module that imports a view has silently become the whole
+   part again.
+2. **`index.ts` is the file no other part may import.** One name, one rule, and a
+   grep for `from '../<part>/index.js'` finds every violation.
+3. **The pure files import no kernel.** `evaluateMath` in `calc` is a
+   self-contained expression parser that today can only be reached by mounting an
+   Application — which is why it has no direct tests.
+4. **One view per file.** A view is already the unit of screen
+   (`spec/application.md`: *a view is a unit of screen, and a window contains a
+   view*), so the file boundary matches one the framework already has.
+
+**`src/shared/` becomes `src/contracts/`.** It holds 116 lines and is exactly
+right today — `THEME_TOKEN`, its type, its token names. The rename is the point:
+a folder named for *who uses it* invites someone to put a helper there, and a
+helper shared between two parts couples two independently versioned artifacts
+with nothing anywhere to say so. Named for *what it may contain*, it does not.
+`boundaries.md` has the full argument.
+
+================================================================================
+WHAT MUST NOT CHANGE
+================================================================================
+
+**Behaviour. Any of it.** All eleven parts are published, and five of them are
+live right now on `demos.localhost` and `todo.localhost` at kernel 0.13.0. A
+reader must be able to confirm this dispatch changed no behaviour by reading the
+diff, and that is only possible if the diff is moves and imports.
+
+- **No renamed exports, no changed signatures, no "while I was in here" fixes.**
+  If you find a bug, write it in the report and leave it.
+- **No behaviour-affecting edits to `workbench`**, which is the largest and the
+  most tempting.
+- **Every existing test passes untouched.** 79 tests, 11 files. If a test needs
+  editing to keep passing, something moved that should not have — stop and say so.
+  The *only* acceptable test edits are import paths.
+
+================================================================================
+VERSIONS
+================================================================================
+
+Bump each part's **patch** version in `mesh.json` — `0.1.0` → `0.1.1`, and `todo`
+`0.2.0` → `0.2.1`. Not a minor: nothing about the interface changes.
+
+The bump is not optional even though nothing behavioural changed. A version is
+immutable and bound to a commit, so republishing `0.1.0` from a new commit is
+refused by the catalog — correctly. The artifact digest *will* change because the
+bytes change; that is expected and is not a problem, because a release names
+digests.
+
+Kernel stays `^0.13`. Do not touch it.
+
+================================================================================
+HOW TO WORK
+================================================================================
+
+**One part per commit.** Eleven commits, each one a single part's split, each one
+reviewable on its own. Do not do all eleven and then commit once — if this dies
+partway through, whatever landed should be complete and correct for those parts.
+
+Start with **`todo` (460 lines)** as the smallest, get the shape right, then
+`theme`, then work up. Leave **`workbench` (1,896) for last**, when the pattern is
+established.
+
+**Run every command in the foreground.** Run the tests after each part, not only
+at the end — a mistake found after eleven splits is eleven splits to bisect.
+
+**Zero `as any`, zero `as never`, zero casts.**
+
+================================================================================
+WHAT GOOD LOOKS LIKE
+================================================================================
+
+- Eleven parts in the shape above, plus `src/contracts/`.
+- `npm test` green — **79 tests**, none of them edited beyond import paths.
+- `npm run typecheck` clean.
+- A grep for `from '../[a-z]*/index.js'` finds nothing — rule 2, mechanically.
+- Patch bumps in `mesh.json`.
+
+================================================================================
+YOUR REPORT
+================================================================================
+
+`agent-runs/reports/8-split-by-boundary.md`
+
+- **which parts had a pure half worth its own file, and which did not.** Rule 3 is
+  the one that will vary most, and the list tells us whether it is a real rule or
+  only true of `calc`.
+- anything whose sections did **not** match the four banners — a part that
+  resisted the shape is more interesting than ten that fit it
+- whether any part imported another's `index.ts` before this, which would be rule
+  2 already violated
+- bugs found and deliberately left, with file and line
+- anything for the reader audit
