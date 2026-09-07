@@ -2,6 +2,7 @@ import {
     needs,
     provider,
     type ProviderToken,
+    type ReadonlySignal,
     type Signal,
 } from '@flybyme/mesh-web';
 
@@ -24,6 +25,17 @@ export interface MarkdownBlock {
 }
 
 export interface MarkdownApi {
+    readonly markdownText: ReadonlySignal<string>;
+    readonly parsedBlocks: () => readonly MarkdownBlock[];
+    readonly charCount: () => number;
+    readonly wordCount: () => number;
+    readonly lineCount: () => number;
+
+    setText(content: string): void;
+    appendLine(line: string): void;
+}
+
+export interface MarkdownInternal {
     readonly markdownText: Signal<string>;
     readonly textRevision: Signal<number>;
     readonly lineDraft: Signal<string>;

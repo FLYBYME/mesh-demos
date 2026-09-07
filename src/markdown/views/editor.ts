@@ -7,9 +7,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { MarkdownApi } from '../contract.js';
+import type { MarkdownApi, MarkdownInternal } from '../contract.js';
 
-export function renderEditorPane(vx: ViewContext<Record<string, never>, MarkdownApi>): Node {
+export function renderEditorPane(vx: ViewContext<Record<string, never>, MarkdownApi, MarkdownInternal>): Node {
     const toolbarBtnStyle = {
         padding: '4px 8px',
         'font-size': '12px',
@@ -148,7 +148,7 @@ export function renderEditorPane(vx: ViewContext<Record<string, never>, Markdown
                                 props: { style: { display: 'flex', gap: '8px' } },
                                 children: [
                                     each(
-                                        () => [vx.app.textRevision()],
+                                        () => [vx.internal.textRevision()],
                                         (rev) => rev,
                                         () => element('Input', {
                                             props: {
