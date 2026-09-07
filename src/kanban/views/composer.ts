@@ -6,9 +6,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { KanbanApi } from '../contract.js';
+import type { KanbanApi, KanbanInternal } from '../contract.js';
 
-export function renderComposerPane(vx: ViewContext<Record<string, never>, KanbanApi>): Node {
+export function renderComposerPane(vx: ViewContext<Record<string, never>, KanbanApi, KanbanInternal>): Node {
     return element('Stack', {
         props: {
             class: 'kanban-pane kanban-composer-pane',
@@ -45,13 +45,13 @@ export function renderComposerPane(vx: ViewContext<Record<string, never>, Kanban
                                         children: [text('Title:')],
                                     }),
                                     each(
-                                        () => [vx.app.draftRevision()],
+                                        () => [vx.internal.draftRevision()],
                                         (rev) => rev,
                                         () => element('Input', {
                                             props: {
                                                 placeholder: 'Task title...',
                                                 class: 'input-card-title',
-                                                value: () => vx.app.draftTitle(),
+                                                value: () => vx.internal.draftTitle(),
                                                 style: {
                                                     padding: '8px',
                                                     'font-size': '13px',
@@ -78,13 +78,13 @@ export function renderComposerPane(vx: ViewContext<Record<string, never>, Kanban
                                         children: [text('Description:')],
                                     }),
                                     each(
-                                        () => [vx.app.draftRevision()],
+                                        () => [vx.internal.draftRevision()],
                                         (rev) => rev,
                                         () => element('Input', {
                                             props: {
                                                 placeholder: 'Detailed task description...',
                                                 class: 'input-card-desc',
-                                                value: () => vx.app.draftDesc(),
+                                                value: () => vx.internal.draftDesc(),
                                                 style: {
                                                     padding: '8px',
                                                     'font-size': '13px',
@@ -122,8 +122,8 @@ export function renderComposerPane(vx: ViewContext<Record<string, never>, Kanban
                                                         'font-size': '11px',
                                                         'border-radius': '4px',
                                                         cursor: 'pointer',
-                                                        background: vx.app.draftColumn() === c.id ? '#1f6feb' : '#21262d',
-                                                        border: vx.app.draftColumn() === c.id ? '1px solid #58a6ff' : '1px solid #30363d',
+                                                        background: vx.internal.draftColumn() === c.id ? '#1f6feb' : '#21262d',
+                                                        border: vx.internal.draftColumn() === c.id ? '1px solid #58a6ff' : '1px solid #30363d',
                                                         color: '#ffffff',
                                                     }),
                                                 },
@@ -155,8 +155,8 @@ export function renderComposerPane(vx: ViewContext<Record<string, never>, Kanban
                                                         'font-size': '11px',
                                                         'border-radius': '4px',
                                                         cursor: 'pointer',
-                                                        background: vx.app.draftPriority() === p ? '#30363d' : '#21262d',
-                                                        border: vx.app.draftPriority() === p ? '1px solid #58a6ff' : '1px solid #30363d',
+                                                        background: vx.internal.draftPriority() === p ? '#30363d' : '#21262d',
+                                                        border: vx.internal.draftPriority() === p ? '1px solid #58a6ff' : '1px solid #30363d',
                                                         color: p === 'high' ? '#f85149' : p === 'medium' ? '#d29922' : '#3fb950',
                                                         'font-weight': 'bold',
                                                         'text-transform': 'capitalize',

@@ -16,6 +16,7 @@ import {
     SAMPLE_CARDS,
     type KanbanApi,
     type KanbanCard,
+    type KanbanInternal,
     type KanbanPriority,
 } from './contract.js';
 import { renderBoardPane } from './views/board.js';
@@ -28,12 +29,13 @@ export {
     type KanbanApi,
     type KanbanCard,
     type KanbanColumn,
+    type KanbanInternal,
     type KanbanPriority,
 } from './contract.js';
 
 // ---------------------------------------------------------------------------- application
 
-export default class KanbanApp implements Application<typeof NEEDS, readonly [], typeof KANBAN> {
+export default class KanbanApp implements Application<typeof NEEDS, readonly [], typeof KANBAN, Record<string, never>, KanbanInternal> {
     readonly needs = NEEDS;
     readonly provides = KANBAN;
 
@@ -69,7 +71,7 @@ export default class KanbanApp implements Application<typeof NEEDS, readonly [],
         ],
     });
 
-    readonly views: readonly ViewDecl<Record<string, never>, KanbanApi>[] = [
+    readonly views: readonly ViewDecl<Record<string, never>, KanbanApi, KanbanInternal>[] = [
         {
             id: 'board',
             title: 'Kanban Board',
@@ -77,7 +79,7 @@ export default class KanbanApp implements Application<typeof NEEDS, readonly [],
             instances: 'one',
             defaultSize: { width: 720, height: 540 },
             minSize: { width: 400, height: 320 },
-            render(vx: ViewContext<Record<string, never>, KanbanApi>): Node {
+            render(vx: ViewContext<Record<string, never>, KanbanApi, KanbanInternal>): Node {
                 return renderBoardPane(vx);
             },
         },
@@ -88,13 +90,13 @@ export default class KanbanApp implements Application<typeof NEEDS, readonly [],
             instances: 'one',
             defaultSize: { width: 340, height: 540 },
             minSize: { width: 260, height: 300 },
-            render(vx: ViewContext<Record<string, never>, KanbanApi>): Node {
+            render(vx: ViewContext<Record<string, never>, KanbanApi, KanbanInternal>): Node {
                 return renderComposerPane(vx);
             },
         },
     ];
 
-    async start(cx: Context<typeof NEEDS, readonly []>): Promise<KanbanApi> {
+    async start(cx: Context<typeof NEEDS, readonly []>): Promise<{ api: KanbanApi; internal: KanbanInternal }> {
         cx.log.info('KanbanApp starting');
 
         const cards = cx.state.signal<readonly KanbanCard[]>(SAMPLE_CARDS);
@@ -298,7 +300,19 @@ export default class KanbanApp implements Application<typeof NEEDS, readonly [],
             }
         });
 
-        return {
+        const api: KanbanApi = {
+            columns: DEFAULT_COLUMNS,
+            cards,
+            heldCardId,
+            heldCard,
+            cardsInColumn,
+            totalCards,
+            addCard,
+            deleteCard,
+            moveCard,
+        };
+
+        const internal: KanbanInternal = {
             columns: DEFAULT_COLUMNS,
             cards,
             heldCardId,
@@ -328,5 +342,7 @@ export default class KanbanApp implements Application<typeof NEEDS, readonly [],
             setDraftPriority,
             submitDraft,
         };
+
+        return { api, internal };
     }
 }
