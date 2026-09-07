@@ -6,9 +6,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { CalcApi } from '../contract.js';
+import type { CalcApi, CalcInternal } from '../contract.js';
 
-export function renderCalcView(vx: ViewContext<Record<string, never>, CalcApi>): Node {
+export function renderCalcView(vx: ViewContext<Record<string, never>, CalcApi, CalcInternal>): Node {
     const btnStyle = {
         padding: '12px 8px',
         'font-size': '16px',
@@ -126,7 +126,7 @@ export function renderCalcView(vx: ViewContext<Record<string, never>, CalcApi>):
                         props: { style: { display: 'flex', gap: '8px', 'align-items': 'center' } },
                         children: [
                             each(
-                                () => [vx.app.expressionRevision()],
+                                () => [vx.internal.expressionRevision()],
                                 (rev) => rev,
                                 () => element('Input', {
                                     props: {

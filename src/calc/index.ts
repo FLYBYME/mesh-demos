@@ -1,5 +1,6 @@
 import {
     tiles,
+    type Api,
     type Application,
     type CommandDecl,
     type Context,
@@ -14,6 +15,7 @@ import {
     NEEDS,
     type CalcApi,
     type CalcHistoryItem,
+    type CalcInternal,
 } from './contract.js';
 import { evaluateMath, formatResult } from './math.js';
 import { renderCalcView } from './views/calc.js';
@@ -23,11 +25,18 @@ export {
     CALC,
     type CalcApi,
     type CalcHistoryItem,
+    type CalcInternal,
 } from './contract.js';
 
 // ---------------------------------------------------------------------------- application
 
-export default class CalcApp implements Application<typeof NEEDS, readonly [], typeof CALC> {
+export default class CalcApp implements Application<
+    typeof NEEDS,
+    readonly [],
+    typeof CALC,
+    Api<Record<string, never>>,
+    CalcInternal
+> {
     readonly needs = NEEDS;
     readonly provides = CALC;
 
@@ -61,7 +70,7 @@ export default class CalcApp implements Application<typeof NEEDS, readonly [], t
         ],
     });
 
-    readonly views: readonly ViewDecl<Record<string, never>, CalcApi>[] = [
+    readonly views: readonly ViewDecl<Record<string, never>, CalcApi, CalcInternal>[] = [
         {
             id: 'calc',
             title: 'Calculator',
@@ -69,7 +78,7 @@ export default class CalcApp implements Application<typeof NEEDS, readonly [], t
             instances: 'one',
             defaultSize: { width: 360, height: 480 },
             minSize: { width: 280, height: 380 },
-            render(vx: ViewContext<Record<string, never>, CalcApi>): Node {
+            render(vx: ViewContext<Record<string, never>, CalcApi, CalcInternal>): Node {
                 return renderCalcView(vx);
             },
         },
@@ -80,13 +89,16 @@ export default class CalcApp implements Application<typeof NEEDS, readonly [], t
             instances: 'one',
             defaultSize: { width: 300, height: 480 },
             minSize: { width: 240, height: 300 },
-            render(vx: ViewContext<Record<string, never>, CalcApi>): Node {
+            render(vx: ViewContext<Record<string, never>, CalcApi, CalcInternal>): Node {
                 return renderHistoryView(vx);
             },
         },
     ];
 
-    async start(cx: Context<typeof NEEDS, readonly []>): Promise<CalcApi> {
+    async start(cx: Context<typeof NEEDS, readonly []>): Promise<{
+        readonly api: CalcApi;
+        readonly internal: CalcInternal;
+    }> {
         cx.log.info('CalcApp starting');
 
         const display = cx.state.signal<string>('0');
@@ -350,7 +362,17 @@ export default class CalcApp implements Application<typeof NEEDS, readonly [], t
             }
         });
 
-        return {
+        const api: CalcApi = {
+            display,
+            formula,
+            history,
+            historyCount,
+            evaluateExpression,
+            clear,
+            clearHistory,
+        };
+
+        const internal: CalcInternal = {
             display,
             formula,
             previousValue,
@@ -372,5 +394,7 @@ export default class CalcApp implements Application<typeof NEEDS, readonly [], t
             recallHistory,
             clearHistory,
         };
+
+        return { api, internal };
     }
 }

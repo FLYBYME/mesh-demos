@@ -7,9 +7,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { CalcApi, CalcHistoryItem } from '../contract.js';
+import type { CalcApi, CalcInternal, CalcHistoryItem } from '../contract.js';
 
-export function renderHistoryView(vx: ViewContext<Record<string, never>, CalcApi>): Node {
+export function renderHistoryView(vx: ViewContext<Record<string, never>, CalcApi, CalcInternal>): Node {
     return element('Stack', {
         props: {
             class: 'calc-pane calc-history-pane',
