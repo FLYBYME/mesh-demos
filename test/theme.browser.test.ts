@@ -8,7 +8,7 @@ import {
     HIGH_CONTRAST_TOKENS,
     THEME_TOKEN,
     THEME_TOKEN_NAMES,
-} from '../src/shared/theme.js';
+} from '../src/contracts/theme.js';
 
 describe('ThemeExtension browser tests', () => {
     afterEach(() => {
