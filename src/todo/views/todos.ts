@@ -7,9 +7,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { TodoApi, TodoItem } from '../contract.js';
+import type { TodoApi, TodoInternal, TodoItem } from '../contract.js';
 
-export function renderTodosView(vx: ViewContext<Record<string, never>, TodoApi>): Node {
+export function renderTodosView(vx: ViewContext<Record<string, never>, TodoApi, TodoInternal>): Node {
     return element('Stack', {
         props: {
             class: 'todo-app-pane',
@@ -38,7 +38,7 @@ export function renderTodosView(vx: ViewContext<Record<string, never>, TodoApi>)
                         },
                         children: [
                             each(
-                                () => [vx.app.draftRevision()],
+                                () => [vx.internal.draftRevision()],
                                 (rev) => rev,
                                 () =>
                                     element('Input', {
@@ -77,7 +77,7 @@ export function renderTodosView(vx: ViewContext<Record<string, never>, TodoApi>)
                 },
                 children: [
                     each(
-                        () => vx.app.items(),
+                        () => vx.internal.items(),
                         (item: TodoItem) => item.id,
                         (item: () => TodoItem) =>
                             element('ListItem', {
@@ -156,7 +156,7 @@ export function renderTodosView(vx: ViewContext<Record<string, never>, TodoApi>)
                         children: [
                             text(
                                 () =>
-                                    `${String(vx.app.outstandingCount())} item${vx.app.outstandingCount() === 1 ? '' : 's'} left`,
+                                    `${String(vx.internal.outstandingCount())} item${vx.internal.outstandingCount() === 1 ? '' : 's'} left`,
                             ),
                         ],
                     }),

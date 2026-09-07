@@ -149,7 +149,7 @@
         {
             "kind": "application",
             "id": "todo",
-            "version": "0.2.1",
+            "version": "0.3.0",
             "entry": "src/todo/index.ts",
             "mesh": [],
             "description": "Track tasks, mark them done, and watch completion stats.",

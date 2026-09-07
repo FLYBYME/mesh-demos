@@ -2,6 +2,7 @@ import {
     needs,
     provider,
     type ProviderToken,
+    type ReadonlySignal,
     type Signal,
 } from '@flybyme/mesh-web';
 
@@ -14,6 +15,17 @@ export interface TodoItem {
 }
 
 export interface TodoApi {
+    readonly items: ReadonlySignal<readonly TodoItem[]>;
+    readonly totalCount: () => number;
+    readonly outstandingCount: () => number;
+    readonly completedCount: () => number;
+    add(title?: string): void;
+    toggle(id: string): void;
+    remove(id: string): void;
+    clearCompleted(): void;
+}
+
+export interface TodoInternal {
     readonly items: Signal<readonly TodoItem[]>;
     readonly draft: Signal<string>;
     readonly draftRevision: Signal<number>;

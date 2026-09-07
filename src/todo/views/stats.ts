@@ -5,9 +5,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { TodoApi } from '../contract.js';
+import type { TodoApi, TodoInternal } from '../contract.js';
 
-export function renderStatsView(vx: ViewContext<Record<string, never>, TodoApi>): Node {
+export function renderStatsView(vx: ViewContext<Record<string, never>, TodoApi, TodoInternal>): Node {
     return element('Stack', {
         props: {
             class: 'todo-stats-pane',
@@ -38,7 +38,7 @@ export function renderStatsView(vx: ViewContext<Record<string, never>, TodoApi>)
                             element('Text', { children: [text('Total items:')] }),
                             element('Badge', {
                                 props: { class: 'badge total-count' },
-                                children: [text(() => String(vx.app.totalCount()))],
+                                children: [text(() => String(vx.internal.totalCount()))],
                             }),
                         ],
                     }),
@@ -48,7 +48,7 @@ export function renderStatsView(vx: ViewContext<Record<string, never>, TodoApi>)
                             element('Text', { children: [text('Outstanding:')] }),
                             element('Badge', {
                                 props: { class: 'badge outstanding-count' },
-                                children: [text(() => String(vx.app.outstandingCount()))],
+                                children: [text(() => String(vx.internal.outstandingCount()))],
                             }),
                         ],
                     }),
@@ -58,7 +58,7 @@ export function renderStatsView(vx: ViewContext<Record<string, never>, TodoApi>)
                             element('Text', { children: [text('Completed:')] }),
                             element('Badge', {
                                 props: { class: 'badge completed-count' },
-                                children: [text(() => String(vx.app.completedCount()))],
+                                children: [text(() => String(vx.internal.completedCount()))],
                             }),
                         ],
                     }),
