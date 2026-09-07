@@ -52,7 +52,7 @@
         {
             "kind": "extension",
             "id": "theme",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "entry": "src/theme/index.ts",
             "description": "Theme tokens for every part on the page: light, dark and high contrast.",
             "keywords": [

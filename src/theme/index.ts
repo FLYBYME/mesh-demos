@@ -1,6 +1,5 @@
 import {
     localProvider,
-    needs,
     type CommandDecl,
     type Context,
     type Extension,
@@ -11,22 +10,33 @@ import {
     DARK_TOKENS,
     HIGH_CONTRAST_TOKENS,
     LIGHT_TOKENS,
+    NEEDS,
     THEME_PRESETS,
     THEME_TOKEN,
     THEME_TOKEN_NAMES,
     isThemeMode,
     type ThemeApi,
     type ThemeMode,
+    type ThemeOptions,
     type ThemeTokenName,
     type ThemeTokens,
-} from '../shared/theme.js';
+} from './contract.js';
 
-export interface ThemeOptions {
-    readonly storage?: StorageProvider;
-    readonly initialMode?: ThemeMode;
-}
-
-const NEEDS = needs('state', 'log', 'commands');
+export {
+    DARK_TOKENS,
+    HIGH_CONTRAST_TOKENS,
+    LIGHT_TOKENS,
+    THEME_PRESETS,
+    THEME_TOKEN,
+    THEME_TOKEN_NAMES,
+    isThemeMode,
+    isThemeTokenName,
+    type ThemeApi,
+    type ThemeMode,
+    type ThemeOptions,
+    type ThemeTokenName,
+    type ThemeTokens,
+} from './contract.js';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
