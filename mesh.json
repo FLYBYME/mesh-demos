@@ -110,7 +110,7 @@
         {
             "kind": "application",
             "id": "markdown",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "entry": "src/markdown/index.ts",
             "description": "Write markdown on the left, see it rendered on the right.",
             "keywords": [
