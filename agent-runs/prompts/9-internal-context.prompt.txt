@@ -1,0 +1,131 @@
+Code lives in:  FLYBYME/mesh-demos — this worktree. All commits go here.
+
+================================================================================
+THE TASK
+================================================================================
+
+**Adopt the internal context, and shrink every published API to what another part
+would actually call.**
+
+Kernel **0.14.0** separated the two objects a part used to conflate. Read
+`node_modules/@flybyme/mesh-web/spec/components.md` §5 and
+`agent-runs/reports/` in mesh-web if you can reach it read-only — but the shape
+is in the kernel's own types and its `test/internal-context.test.ts`.
+
+Until 0.14, `ViewContext.app` was a view's **only** route to its own state, so
+every signal a view needed had to be public. The result, measured here:
+
+| part | `signal()` | members published |
+| --- | --- | --- |
+| `workbench` | 8 | **32** |
+| `kanban` | 9 | 28 |
+| `notes` | 7 | 24 |
+| `clock` | 12 | 23 |
+| `calc` | 7 | 20 |
+| `whoami` | 7 | 19 |
+| `chart` | 6 | 19 |
+| `markdown` | 3 | 14 |
+| `todo` | 3 | 13 |
+
+`WorkbenchApi` publishes **eight raw `Signal<T>`** — mutable, so anything holding
+the API can `.set()` them — plus **ten methods that merely forward to
+`cx.chrome`**, which any consumer already has, plus `filterRevision` and
+`docRevision`: revision counters that worked around the A7.0 `Input` bug **kernel
+0.11 fixed**. A workaround became permanent public API.
+
+================================================================================
+FIRST, UPGRADE
+================================================================================
+
+`package.json` and `mesh.json` are on kernel `^0.13`. Move both to **`^0.14`**,
+then:
+
+    rm -rf node_modules/@flybyme/mesh-web && npm install
+    node -e "console.log(require('./node_modules/@flybyme/mesh-web/package.json').version)"
+
+**Check that it prints 0.14.0.** npm reuses a cached git dependency when the
+lockfile still resolves to an older commit, and this has already bitten twice —
+mesh-core's tests once passed against 0.11.1 while `package.json` said 0.13.0.
+
+================================================================================
+WHAT TO DO, PER PART
+================================================================================
+
+For each of the eleven parts, decide **what another part would actually call**,
+and publish only that.
+
+Three rules, in order of how much they remove:
+
+1. **A part never re-exports a capability.** `focusWindow`, `closeWindow`,
+   `maximizeWindow`, `minimizeWindow`, `restoreWindow`, `windows`, `setMode`,
+   `getMode`… a consumer that wants those declares `needs('windows')` or
+   `needs('chrome')` and has them directly. Ten forwarding methods on
+   `WorkbenchApi` are ten ways to reach one thing. **Delete them from the API**;
+   the views keep calling `cx.chrome` as they always did.
+2. **State is published as `ReadonlySignal<T>`, never `Signal<T>`.** A writable
+   handle on a public interface is a field with a setter nobody asked for. Where a
+   consumer genuinely needs to change something, that is a **method** with a name
+   describing the change.
+3. **A workaround is never API.** `filterRevision` and `docRevision` should have
+   gone when 0.11 fixed the bug they existed for. Look for others.
+
+**Everything else moves to the internal context** — the views keep working
+unchanged, because that is what the kernel change was for.
+
+### What "actually call" means
+
+`palette` consumes `theme`'s token. `whoami` consumes `AUTH`. Those are the only
+cross-part consumers in this repository, so **most of these APIs have no consumer
+at all** — and a part nothing consumes should publish very little. Do not invent
+a plausible-looking API; publish what is used, plus what a part genuinely offers
+as a capability.
+
+If a part ends up publishing **nothing**, that is a real answer. Say so rather
+than keeping one member for appearance.
+
+================================================================================
+WHAT NOT TO DO
+================================================================================
+
+**Do not change behaviour.** Every part is published and five are live on
+`demos.localhost` and `todo.localhost` right now. Same views, same actions, same
+rendering. This moves where state lives and what is published.
+
+**Do not restructure files.** The parts were split into
+`contract.ts` / pure / `views/` / `index.ts` and that layout stays.
+
+**Do not touch `theme`'s `THEME_TOKEN` or the `contracts/` folder.** Those are the
+cross-part contracts and they are correct.
+
+**Zero `as any`, zero `as never`, zero casts.** Foreground commands, commit as you
+go — **one part per commit**, so a mistake is one part to bisect rather than
+eleven.
+
+================================================================================
+WHAT GOOD LOOKS LIKE
+================================================================================
+
+- **A stated before-and-after count of published members, per part.** That table
+  is the result; the code is how you got there.
+- All 79 tests passing, **none edited except for import paths**. If a test needs a
+  real change it was reaching through the API into internals, which is itself the
+  finding — say which test and what it was reaching for.
+- `npm run typecheck` clean.
+- Minor bumps in `mesh.json` — `0.1.1` → `0.2.0`, `todo` `0.2.1` → `0.3.0`. A
+  published interface shrinking is a breaking change for anyone consuming it, and
+  a minor is the honest signal at `0.x`.
+- Kernel `^0.14` in `mesh.json` and `package.json`.
+
+================================================================================
+YOUR REPORT
+================================================================================
+
+`agent-runs/reports/9-internal-context.md`
+
+- **the before-and-after table**, and the total removed
+- which parts ended up publishing nothing, and whether that felt wrong
+- **anything a view needed that the internal context could not give it** — you are
+  the first real adopter and that list is worth more than the refactor
+- whether any test was reaching through an API into internals
+- anything for the reader audit: a field or member you kept only because deleting
+  it felt rude is exactly what that audit is for
