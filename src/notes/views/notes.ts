@@ -7,9 +7,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { Note, NotesApi } from '../contract.js';
+import type { Note, NotesApi, NotesInternal } from '../contract.js';
 
-export function renderNotesListView(vx: ViewContext<Record<string, never>, NotesApi>): Node {
+export function renderNotesListView(vx: ViewContext<Record<string, never>, NotesApi, NotesInternal>): Node {
     return element('Stack', {
         props: {
             class: 'notes-pane notes-list-pane',
@@ -50,7 +50,7 @@ export function renderNotesListView(vx: ViewContext<Record<string, never>, Notes
                         props: { style: { display: 'flex', gap: '8px', 'align-items': 'center' } },
                         children: [
                             each(
-                                () => [vx.app.filterRevision()],
+                                () => [vx.internal.filterRevision()],
                                 (rev) => rev,
                                 () => element('Input', {
                                     props: {
@@ -86,7 +86,7 @@ export function renderNotesListView(vx: ViewContext<Record<string, never>, Notes
                     element('Text', {
                         props: { class: 'filter-status-text' },
                         children: [
-                            text(() => `Showing ${String(vx.app.filteredCount())} of ${String(vx.app.totalCount())} notes`),
+                            text(() => `Showing ${String(vx.internal.filteredCount())} of ${String(vx.app.totalCount())} notes`),
                         ],
                     }),
                     element('Button', {
@@ -112,7 +112,7 @@ export function renderNotesListView(vx: ViewContext<Record<string, never>, Notes
                 },
                 children: [
                     each(
-                        () => vx.app.filteredNotes(),
+                        () => vx.internal.filteredNotes(),
                         (note: Note) => note.id,
                         (note: () => Note) =>
                             element('ListItem', {
@@ -201,7 +201,7 @@ export function renderNotesListView(vx: ViewContext<Record<string, never>, Notes
                 ],
             }),
             when(
-                () => vx.app.filteredCount() === 0,
+                () => vx.internal.filteredCount() === 0,
                 () => element('Card', {
                     props: {
                         class: 'empty-notes-card',

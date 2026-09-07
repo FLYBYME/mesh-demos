@@ -14,17 +14,18 @@ import {
     NOTES,
     type Note,
     type NotesApi,
+    type NotesInternal,
 } from './contract.js';
 import { countWords, formatNoteDate } from './format.js';
 import { renderNotesListView } from './views/notes.js';
 import { renderEditorView } from './views/editor.js';
 import { renderStatsView } from './views/stats.js';
 
-export { NOTES, type Note, type NotesApi } from './contract.js';
+export { NOTES, type Note, type NotesApi, type NotesInternal } from './contract.js';
 
 // ---------------------------------------------------------------------------- application
 
-export default class NotesApp implements Application<typeof NEEDS, readonly [], typeof NOTES> {
+export default class NotesApp implements Application<typeof NEEDS, readonly [], typeof NOTES, Record<string, never>, NotesInternal> {
     readonly needs = NEEDS;
     readonly provides = NOTES;
 
@@ -60,7 +61,7 @@ export default class NotesApp implements Application<typeof NEEDS, readonly [], 
         ],
     });
 
-    readonly views: readonly ViewDecl<Record<string, never>, NotesApi>[] = [
+    readonly views: readonly ViewDecl<Record<string, never>, NotesApi, NotesInternal>[] = [
         {
             id: 'notes',
             title: 'Notes List',
@@ -68,7 +69,7 @@ export default class NotesApp implements Application<typeof NEEDS, readonly [], 
             instances: 'one',
             defaultSize: { width: 420, height: 520 },
             minSize: { width: 300, height: 260 },
-            render(vx: ViewContext<Record<string, never>, NotesApi>): Node {
+            render(vx: ViewContext<Record<string, never>, NotesApi, NotesInternal>): Node {
                 return renderNotesListView(vx);
             },
         },
@@ -79,7 +80,7 @@ export default class NotesApp implements Application<typeof NEEDS, readonly [], 
             instances: 'one',
             defaultSize: { width: 440, height: 520 },
             minSize: { width: 320, height: 260 },
-            render(vx: ViewContext<Record<string, never>, NotesApi>): Node {
+            render(vx: ViewContext<Record<string, never>, NotesApi, NotesInternal>): Node {
                 return renderEditorView(vx);
             },
         },
@@ -90,13 +91,13 @@ export default class NotesApp implements Application<typeof NEEDS, readonly [], 
             instances: 'one',
             defaultSize: { width: 320, height: 420 },
             minSize: { width: 240, height: 220 },
-            render(vx: ViewContext<Record<string, never>, NotesApi>): Node {
+            render(vx: ViewContext<Record<string, never>, NotesApi, NotesInternal>): Node {
                 return renderStatsView(vx);
             },
         },
     ];
 
-    async start(cx: Context<typeof NEEDS, readonly []>): Promise<NotesApi> {
+    async start(cx: Context<typeof NEEDS, readonly []>): Promise<{ api: NotesApi; internal: NotesInternal }> {
         cx.log.info('NotesApp starting');
 
         const notes = cx.state.signal<readonly Note[]>([]);
@@ -317,7 +318,20 @@ export default class NotesApp implements Application<typeof NEEDS, readonly [], 
             }
         });
 
-        return {
+        const api: NotesApi = {
+            notes,
+            filterText,
+            selectedId,
+            selectedNote,
+            totalCount,
+            totalWords,
+            createNote,
+            updateNote,
+            deleteNote,
+            selectNote,
+        };
+
+        const internal: NotesInternal = {
             notes,
             filterText,
             filterRevision,
@@ -343,5 +357,7 @@ export default class NotesApp implements Application<typeof NEEDS, readonly [], 
             clearAll,
             addSample,
         };
+
+        return { api, internal };
     }
 }

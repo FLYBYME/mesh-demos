@@ -39,7 +39,7 @@
         {
             "kind": "application",
             "id": "notes",
-            "version": "0.1.1",
+            "version": "0.2.0",
             "entry": "src/notes/index.ts",
             "description": "Write, edit, search and delete notes.",
             "keywords": [
