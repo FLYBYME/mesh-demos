@@ -178,7 +178,7 @@ describe('Workbench Application browser tests', () => {
         // Framework defect: start.ts never calls site.manager.setLayout(app.layout).
         // To exercise tiled mode layout tree resolution, set the layout explicitly on the manager.
         site.manager.setLayout(WorkbenchApp.layout);
-        api.setMode('tiled');
+        site.manager.setMode('tiled');
         flushSync();
 
         expect(site.manager.mode()).toBe('tiled');
@@ -210,7 +210,7 @@ describe('Workbench Application browser tests', () => {
         expect(hiddenMonitor).toBeDefined();
 
         // Switch back to windowed mode
-        api.setMode('windowed');
+        site.manager.setMode('windowed');
         flushSync();
 
         expect(site.manager.mode()).toBe('windowed');

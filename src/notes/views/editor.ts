@@ -7,9 +7,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { NotesApi } from '../contract.js';
+import type { NotesApi, NotesInternal } from '../contract.js';
 
-export function renderEditorView(vx: ViewContext<Record<string, never>, NotesApi>): Node {
+export function renderEditorView(vx: ViewContext<Record<string, never>, NotesApi, NotesInternal>): Node {
     return element('Stack', {
         props: {
             class: 'notes-pane notes-editor-pane',
@@ -61,13 +61,13 @@ export function renderEditorView(vx: ViewContext<Record<string, never>, NotesApi
                                 children: [text('Title:')],
                             }),
                             each(
-                                () => [vx.app.draftRevision()],
+                                () => [vx.internal.draftRevision()],
                                 (rev) => rev,
                                 () => element('Input', {
                                     props: {
                                         placeholder: 'Note title...',
                                         class: 'input-note-title',
-                                        value: () => vx.app.draftTitle(),
+                                        value: () => vx.internal.draftTitle(),
                                         style: { padding: '8px', 'font-size': '14px' },
                                     },
                                     intents: {
@@ -80,13 +80,13 @@ export function renderEditorView(vx: ViewContext<Record<string, never>, NotesApi
                                 children: [text('Content:')],
                             }),
                             each(
-                                () => [vx.app.draftRevision()],
+                                () => [vx.internal.draftRevision()],
                                 (rev) => rev,
                                 () => element('Input', {
                                     props: {
                                         placeholder: 'Write your note here...',
                                         class: 'input-note-body',
-                                        value: () => vx.app.draftBody(),
+                                        value: () => vx.internal.draftBody(),
                                         style: { padding: '8px', 'font-size': '14px' },
                                     },
                                     intents: {

@@ -2,6 +2,7 @@ import {
     needs,
     provider,
     type ProviderToken,
+    type ReadonlySignal,
     type Signal,
 } from '@flybyme/mesh-web';
 
@@ -25,6 +26,19 @@ export interface KanbanCard {
 }
 
 export interface KanbanApi {
+    readonly columns: readonly KanbanColumn[];
+    readonly cards: ReadonlySignal<readonly KanbanCard[]>;
+    readonly heldCardId: ReadonlySignal<string | null>;
+    readonly heldCard: () => KanbanCard | null;
+
+    cardsInColumn(colId: string): readonly KanbanCard[];
+    totalCards: () => number;
+    addCard(title: string, description: string, colId: string, priority: KanbanPriority): void;
+    deleteCard(id: string): void;
+    moveCard(id: string, targetColId: string): void;
+}
+
+export interface KanbanInternal {
     readonly columns: readonly KanbanColumn[];
     readonly cards: Signal<readonly KanbanCard[]>;
     readonly heldCardId: Signal<string | null>;

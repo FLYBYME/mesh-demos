@@ -14,6 +14,7 @@ import {
     NEEDS,
     SAMPLE_MARKDOWN,
     type MarkdownApi,
+    type MarkdownInternal,
 } from './contract.js';
 import { parseMarkdownDocument } from './parser.js';
 import { renderEditorPane } from './views/editor.js';
@@ -23,12 +24,13 @@ export {
     MARKDOWN,
     type MarkdownApi,
     type MarkdownBlock,
+    type MarkdownInternal,
     type MarkdownSpan,
 } from './contract.js';
 
 // ---------------------------------------------------------------------------- application
 
-export default class MarkdownApp implements Application<typeof NEEDS, readonly [], typeof MARKDOWN> {
+export default class MarkdownApp implements Application<typeof NEEDS, readonly [], typeof MARKDOWN, Record<string, never>, MarkdownInternal> {
     readonly needs = NEEDS;
     readonly provides = MARKDOWN;
 
@@ -55,7 +57,7 @@ export default class MarkdownApp implements Application<typeof NEEDS, readonly [
         ],
     });
 
-    readonly views: readonly ViewDecl<Record<string, never>, MarkdownApi>[] = [
+    readonly views: readonly ViewDecl<Record<string, never>, MarkdownApi, MarkdownInternal>[] = [
         {
             id: 'editor',
             title: 'Markdown Editor',
@@ -63,7 +65,7 @@ export default class MarkdownApp implements Application<typeof NEEDS, readonly [
             instances: 'one',
             defaultSize: { width: 440, height: 520 },
             minSize: { width: 320, height: 300 },
-            render(vx: ViewContext<Record<string, never>, MarkdownApi>): Node {
+            render(vx: ViewContext<Record<string, never>, MarkdownApi, MarkdownInternal>): Node {
                 return renderEditorPane(vx);
             },
         },
@@ -74,13 +76,13 @@ export default class MarkdownApp implements Application<typeof NEEDS, readonly [
             instances: 'one',
             defaultSize: { width: 440, height: 520 },
             minSize: { width: 320, height: 300 },
-            render(vx: ViewContext<Record<string, never>, MarkdownApi>): Node {
+            render(vx: ViewContext<Record<string, never>, MarkdownApi, MarkdownInternal>): Node {
                 return renderPreviewPane(vx);
             },
         },
     ];
 
-    async start(cx: Context<typeof NEEDS, readonly []>): Promise<MarkdownApi> {
+    async start(cx: Context<typeof NEEDS, readonly []>): Promise<{ api: MarkdownApi; internal: MarkdownInternal }> {
         cx.log.info('MarkdownApp starting');
 
         const markdownText = cx.state.signal<string>(SAMPLE_MARKDOWN);
@@ -170,7 +172,17 @@ export default class MarkdownApp implements Application<typeof NEEDS, readonly [
             }
         });
 
-        return {
+        const api: MarkdownApi = {
+            markdownText,
+            parsedBlocks,
+            charCount,
+            wordCount,
+            lineCount,
+            setText,
+            appendLine,
+        };
+
+        const internal: MarkdownInternal = {
             markdownText,
             textRevision,
             lineDraft,
@@ -186,5 +198,7 @@ export default class MarkdownApp implements Application<typeof NEEDS, readonly [
             setLineDraft,
             submitLineDraft,
         };
+
+        return { api, internal };
     }
 }

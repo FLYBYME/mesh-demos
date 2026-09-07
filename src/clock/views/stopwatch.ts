@@ -7,9 +7,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { ClockApi, LapItem } from '../contract.js';
+import type { ClockApi, ClockInternal, LapItem } from '../contract.js';
 
-export function renderStopwatchView(vx: ViewContext<Record<string, never>, ClockApi>): Node {
+export function renderStopwatchView(vx: ViewContext<Record<string, never>, ClockApi, ClockInternal>): Node {
     return element('Stack', {
         props: {
             class: 'clock-pane stopwatch-pane',

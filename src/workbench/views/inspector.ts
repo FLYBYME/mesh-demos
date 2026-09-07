@@ -8,12 +8,12 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { WorkbenchApi } from '../contract.js';
+import type { WorkbenchApi, WorkbenchInternal } from '../contract.js';
 
 // ---------------------------------------------------------------------------- views
 
-export function renderInspectorView(vx: ViewContext<Record<string, Json>, WorkbenchApi>): Node {
-    const app = vx.app;
+export function renderInspectorView(vx: ViewContext<Record<string, Json>, WorkbenchApi, WorkbenchInternal>): Node {
+    const app = vx.internal;
 
     return element('Stack', {
         props: {

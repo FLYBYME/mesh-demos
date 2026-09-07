@@ -9,9 +9,9 @@ import {
 import {
     THEME_TOKEN_NAMES,
 } from '../../contracts/theme.js';
-import type { PaletteApi } from '../contract.js';
+import type { PaletteApi, PaletteInternal } from '../contract.js';
 
-export function renderTokensView(vx: ViewContext<Record<string, never>, PaletteApi>): Node {
+export function renderTokensView(vx: ViewContext<Record<string, never>, PaletteApi, PaletteInternal>): Node {
     return element('Stack', {
         props: {
             class: 'palette-pane tokens-pane',
@@ -133,7 +133,7 @@ export function renderTokensView(vx: ViewContext<Record<string, never>, PaletteA
                                                         height: '20px',
                                                         'border-radius': '4px',
                                                         border: '1px solid var(--edge)',
-                                                        background: vx.app.tokens()[tokenName()],
+                                                        background: vx.internal.tokens()[tokenName()],
                                                         'flex-shrink': '0',
                                                     }),
                                                 },
@@ -160,7 +160,7 @@ export function renderTokensView(vx: ViewContext<Record<string, never>, PaletteA
                                                                 'font-family': 'monospace',
                                                             },
                                                         },
-                                                        children: [text(() => vx.app.tokens()[tokenName()])],
+                                                        children: [text(() => vx.internal.tokens()[tokenName()])],
                                                     }),
                                                 ],
                                             }),

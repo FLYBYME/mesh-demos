@@ -18,6 +18,7 @@ import {
     type TerminalSession,
     type WorkbenchApi,
     type WorkbenchDocument,
+    type WorkbenchInternal,
 } from './contract.js';
 import { countLines, countWords, detectLanguage, timestampStr } from './helpers.js';
 import { renderEditorView } from './views/editor.js';
@@ -31,6 +32,7 @@ export {
     type TerminalSession,
     type WorkbenchApi,
     type WorkbenchDocument,
+    type WorkbenchInternal,
 };
 
 // ---------------------------------------------------------------------------- application
@@ -53,7 +55,7 @@ export const WORKBENCH_LAYOUT: LayoutNode = tiles({
     ],
 });
 
-export default class WorkbenchApp implements Application<typeof NEEDS, readonly [], typeof WORKBENCH> {
+export default class WorkbenchApp implements Application<typeof NEEDS, readonly [], typeof WORKBENCH, Record<string, Json>, WorkbenchInternal> {
     static readonly layout = WORKBENCH_LAYOUT;
 
     readonly needs = NEEDS;
@@ -96,7 +98,7 @@ export default class WorkbenchApp implements Application<typeof NEEDS, readonly 
         { command: 'workbench.saveDoc', keys: 'ctrl+s' },
     ];
 
-    readonly views: readonly ViewDecl<Record<string, Json>, WorkbenchApi>[] = [
+    readonly views: readonly ViewDecl<Record<string, Json>, WorkbenchApi, WorkbenchInternal>[] = [
         {
             id: 'explorer',
             title: 'Explorer',
@@ -104,7 +106,7 @@ export default class WorkbenchApp implements Application<typeof NEEDS, readonly 
             instances: 'one',
             defaultSize: { width: 280, height: 600 },
             minSize: { width: 200, height: 300 },
-            render(vx: ViewContext<Record<string, Json>, WorkbenchApi>): Node {
+            render(vx: ViewContext<Record<string, Json>, WorkbenchApi, WorkbenchInternal>): Node {
                 return renderExplorerView(vx);
             },
         },
@@ -115,7 +117,7 @@ export default class WorkbenchApp implements Application<typeof NEEDS, readonly 
             instances: 'many',
             defaultSize: { width: 500, height: 420 },
             minSize: { width: 300, height: 240 },
-            render(vx: ViewContext<Record<string, Json>, WorkbenchApi>): Node {
+            render(vx: ViewContext<Record<string, Json>, WorkbenchApi, WorkbenchInternal>): Node {
                 return renderEditorView(vx);
             },
         },
@@ -126,7 +128,7 @@ export default class WorkbenchApp implements Application<typeof NEEDS, readonly 
             instances: 'many',
             defaultSize: { width: 500, height: 280 },
             minSize: { width: 300, height: 180 },
-            render(vx: ViewContext<Record<string, Json>, WorkbenchApi>): Node {
+            render(vx: ViewContext<Record<string, Json>, WorkbenchApi, WorkbenchInternal>): Node {
                 return renderTerminalView(vx);
             },
         },
@@ -137,7 +139,7 @@ export default class WorkbenchApp implements Application<typeof NEEDS, readonly 
             instances: 'one',
             defaultSize: { width: 320, height: 540 },
             minSize: { width: 240, height: 300 },
-            render(vx: ViewContext<Record<string, Json>, WorkbenchApi>): Node {
+            render(vx: ViewContext<Record<string, Json>, WorkbenchApi, WorkbenchInternal>): Node {
                 return renderInspectorView(vx);
             },
         },
@@ -147,13 +149,13 @@ export default class WorkbenchApp implements Application<typeof NEEDS, readonly 
             instances: 'one',
             defaultSize: { width: 340, height: 320 },
             minSize: { width: 240, height: 200 },
-            render(vx: ViewContext<Record<string, Json>, WorkbenchApi>): Node {
+            render(vx: ViewContext<Record<string, Json>, WorkbenchApi, WorkbenchInternal>): Node {
                 return renderMonitorView(vx);
             },
         },
     ];
 
-    async start(cx: Context<typeof NEEDS, readonly []>): Promise<WorkbenchApi> {
+    async start(cx: Context<typeof NEEDS, readonly []>): Promise<{ api: WorkbenchApi; internal: WorkbenchInternal }> {
         cx.log.info('WorkbenchApp starting');
 
         const initialDocs: readonly WorkbenchDocument[] = [
@@ -578,6 +580,22 @@ export default class WorkbenchApp implements Application<typeof NEEDS, readonly 
         const api: WorkbenchApi = {
             documents,
             terminals,
+            openFile,
+            openTerminal,
+            openExplorer,
+            openInspector,
+            openMonitor,
+            createFile,
+            saveDoc,
+            revertDoc,
+            updateDocContent,
+            runTerminalCommand,
+            clearTerminal,
+        };
+
+        const internal: WorkbenchInternal = {
+            documents,
+            terminals,
             activeFileId,
             activeTerminalSession,
             eventLogs,
@@ -611,6 +629,6 @@ export default class WorkbenchApp implements Application<typeof NEEDS, readonly 
             cascadeWindows,
         };
 
-        return api;
+        return { api, internal };
     }
 }

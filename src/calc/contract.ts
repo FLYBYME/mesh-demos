@@ -2,6 +2,7 @@ import {
     needs,
     provider,
     type ProviderToken,
+    type ReadonlySignal,
     type Signal,
 } from '@flybyme/mesh-web';
 
@@ -15,6 +16,17 @@ export interface CalcHistoryItem {
 }
 
 export interface CalcApi {
+    readonly display: ReadonlySignal<string>;
+    readonly formula: ReadonlySignal<string>;
+    readonly history: ReadonlySignal<readonly CalcHistoryItem[]>;
+    readonly historyCount: () => number;
+
+    evaluateExpression(expr: string): void;
+    clear(): void;
+    clearHistory(): void;
+}
+
+export interface CalcInternal {
     readonly display: Signal<string>;
     readonly formula: Signal<string>;
     readonly previousValue: Signal<string | null>;

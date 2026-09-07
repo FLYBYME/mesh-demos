@@ -7,10 +7,10 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { WorkbenchApi } from '../contract.js';
+import type { WorkbenchApi, WorkbenchInternal } from '../contract.js';
 
-export function renderTerminalView(vx: ViewContext<Record<string, Json>, WorkbenchApi>): Node {
-    const app = vx.app;
+export function renderTerminalView(vx: ViewContext<Record<string, Json>, WorkbenchApi, WorkbenchInternal>): Node {
+    const app = vx.internal;
     const sessionParam = typeof vx.params['session'] === 'string' ? vx.params['session'] : 'build';
 
     return element('Stack', {

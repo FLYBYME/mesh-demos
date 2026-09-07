@@ -1,5 +1,6 @@
 import {
     tiles,
+    type Api,
     type Application,
     type CommandDecl,
     type Context,
@@ -15,6 +16,7 @@ import {
     NEEDS,
     type ChartApi,
     type ChartDataPoint,
+    type ChartInternal,
     type ChartSeries,
 } from './contract.js';
 import { renderChartView } from './views/chart.js';
@@ -25,12 +27,19 @@ export {
     DEFAULT_SERIES,
     type ChartApi,
     type ChartDataPoint,
+    type ChartInternal,
     type ChartSeries,
 } from './contract.js';
 
 // ---------------------------------------------------------------------------- application
 
-export default class ChartApp implements Application<typeof NEEDS, readonly [], typeof CHART> {
+export default class ChartApp implements Application<
+    typeof NEEDS,
+    readonly [],
+    typeof CHART,
+    Api<Record<string, never>>,
+    ChartInternal
+> {
     readonly needs = NEEDS;
     readonly provides = CHART;
 
@@ -59,7 +68,7 @@ export default class ChartApp implements Application<typeof NEEDS, readonly [], 
         ],
     });
 
-    readonly views: readonly ViewDecl<Record<string, never>, ChartApi>[] = [
+    readonly views: readonly ViewDecl<Record<string, never>, ChartApi, ChartInternal>[] = [
         {
             id: 'chart',
             title: 'Chart Visualizer',
@@ -67,7 +76,7 @@ export default class ChartApp implements Application<typeof NEEDS, readonly [], 
             instances: 'one',
             defaultSize: { width: 560, height: 500 },
             minSize: { width: 340, height: 300 },
-            render(vx: ViewContext<Record<string, never>, ChartApi>): Node {
+            render(vx: ViewContext<Record<string, never>, ChartApi, ChartInternal>): Node {
                 return renderChartView(vx);
             },
         },
@@ -78,13 +87,16 @@ export default class ChartApp implements Application<typeof NEEDS, readonly [], 
             instances: 'one',
             defaultSize: { width: 320, height: 500 },
             minSize: { width: 260, height: 300 },
-            render(vx: ViewContext<Record<string, never>, ChartApi>): Node {
+            render(vx: ViewContext<Record<string, never>, ChartApi, ChartInternal>): Node {
                 return renderDataEditorView(vx);
             },
         },
     ];
 
-    async start(cx: Context<typeof NEEDS, readonly []>): Promise<ChartApi> {
+    async start(cx: Context<typeof NEEDS, readonly []>): Promise<{
+        readonly api: ChartApi;
+        readonly internal: ChartInternal;
+    }> {
         cx.log.info('ChartApp starting');
 
         const seriesList = cx.state.signal<readonly ChartSeries[]>(DEFAULT_SERIES);
@@ -227,7 +239,21 @@ export default class ChartApp implements Application<typeof NEEDS, readonly [], 
             }
         });
 
-        return {
+        const api: ChartApi = {
+            seriesList,
+            activeSeriesId,
+            chartOrientation,
+            activeSeries,
+            maxValue,
+            minValue,
+            averageValue,
+            totalValue,
+            selectSeries,
+            addDataPoint,
+            deleteDataPoint,
+        };
+
+        const internal: ChartInternal = {
             seriesList,
             activeSeriesId,
             chartOrientation,
@@ -248,5 +274,7 @@ export default class ChartApp implements Application<typeof NEEDS, readonly [], 
             submitDraft,
             resetDefaults,
         };
+
+        return { api, internal };
     }
 }

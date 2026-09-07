@@ -24,16 +24,17 @@ import {
     NEEDS,
     PALETTE,
     type PaletteApi,
+    type PaletteInternal,
 } from './contract.js';
 import { renderTokensView } from './views/tokens.js';
 import { renderEditorView } from './views/editor.js';
 import { renderPreviewView } from './views/preview.js';
 
-export { PALETTE, type PaletteApi } from './contract.js';
+export { PALETTE, type PaletteApi, type PaletteInternal } from './contract.js';
 
 // ---------------------------------------------------------------------------- application
 
-export default class PaletteApp implements Application<typeof NEEDS, typeof CONSUMES, typeof PALETTE> {
+export default class PaletteApp implements Application<typeof NEEDS, typeof CONSUMES, typeof PALETTE, Record<string, never>, PaletteInternal> {
     readonly needs = NEEDS;
     readonly consumes = CONSUMES;
     readonly provides = PALETTE;
@@ -55,7 +56,7 @@ export default class PaletteApp implements Application<typeof NEEDS, typeof CONS
         ],
     });
 
-    readonly views: readonly ViewDecl<Record<string, never>, PaletteApi>[] = [
+    readonly views: readonly ViewDecl<Record<string, never>, PaletteApi, PaletteInternal>[] = [
         {
             id: 'tokens',
             title: 'Theme Tokens',
@@ -63,7 +64,7 @@ export default class PaletteApp implements Application<typeof NEEDS, typeof CONS
             instances: 'one',
             defaultSize: { width: 440, height: 500 },
             minSize: { width: 320, height: 300 },
-            render(vx: ViewContext<Record<string, never>, PaletteApi>): Node {
+            render(vx: ViewContext<Record<string, never>, PaletteApi, PaletteInternal>): Node {
                 return renderTokensView(vx);
             },
         },
@@ -74,7 +75,7 @@ export default class PaletteApp implements Application<typeof NEEDS, typeof CONS
             instances: 'one',
             defaultSize: { width: 380, height: 400 },
             minSize: { width: 280, height: 260 },
-            render(vx: ViewContext<Record<string, never>, PaletteApi>): Node {
+            render(vx: ViewContext<Record<string, never>, PaletteApi, PaletteInternal>): Node {
                 return renderEditorView(vx);
             },
         },
@@ -85,7 +86,7 @@ export default class PaletteApp implements Application<typeof NEEDS, typeof CONS
             instances: 'one',
             defaultSize: { width: 380, height: 400 },
             minSize: { width: 280, height: 260 },
-            render(vx: ViewContext<Record<string, never>, PaletteApi>): Node {
+            render(vx: ViewContext<Record<string, never>, PaletteApi, PaletteInternal>): Node {
                 return renderPreviewView(vx);
             },
         },
@@ -112,7 +113,7 @@ export default class PaletteApp implements Application<typeof NEEDS, typeof CONS
         { command: 'palette.reset', keys: 'ctrl+r' },
     ];
 
-    async start(cx: Context<typeof NEEDS, typeof CONSUMES>): Promise<PaletteApi> {
+    async start(cx: Context<typeof NEEDS, typeof CONSUMES>): Promise<{ api: PaletteApi; internal: PaletteInternal }> {
         cx.log.info('PaletteApp starting');
 
         // Resolve theme Extension provider from kernel context
@@ -223,7 +224,13 @@ export default class PaletteApp implements Application<typeof NEEDS, typeof CONS
             }
         });
 
-        return {
+        const api: PaletteApi = {
+            selectedToken,
+            activeMode,
+            selectToken,
+        };
+
+        const internal: PaletteInternal = {
             selectedToken,
             draftValue,
             draftRevision,
@@ -235,5 +242,7 @@ export default class PaletteApp implements Application<typeof NEEDS, typeof CONS
             switchMode,
             reset,
         };
+
+        return { api, internal };
     }
 }

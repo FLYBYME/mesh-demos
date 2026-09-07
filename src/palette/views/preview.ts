@@ -4,9 +4,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { PaletteApi } from '../contract.js';
+import type { PaletteApi, PaletteInternal } from '../contract.js';
 
-export function renderPreviewView(_vx: ViewContext<Record<string, never>, PaletteApi>): Node {
+export function renderPreviewView(_vx: ViewContext<Record<string, never>, PaletteApi, PaletteInternal>): Node {
     return element('Stack', {
         props: {
             class: 'palette-pane preview-pane',

@@ -11,6 +11,7 @@ import type {
     KanbanApi,
     KanbanCard,
     KanbanColumn,
+    KanbanInternal,
     KanbanPriority,
 } from '../contract.js';
 
@@ -29,7 +30,7 @@ function getPriorityColor(priority: KanbanPriority): { bg: string; text: string 
 function renderCardItem(
     card: KanbanCard,
     col: KanbanColumn,
-    vx: ViewContext<Record<string, never>, KanbanApi>,
+    vx: ViewContext<Record<string, never>, KanbanApi, KanbanInternal>,
 ): Node {
     const priorityColor = getPriorityColor(card.priority);
     const colIndex = vx.app.columns.findIndex((c) => c.id === col.id);
@@ -178,7 +179,7 @@ function renderCardItem(
     });
 }
 
-function renderColumn(col: KanbanColumn, vx: ViewContext<Record<string, never>, KanbanApi>): Node {
+function renderColumn(col: KanbanColumn, vx: ViewContext<Record<string, never>, KanbanApi, KanbanInternal>): Node {
     return element('Stack', {
         props: {
             class: `kanban-column kanban-column-${col.id}`,
@@ -300,7 +301,7 @@ function renderColumn(col: KanbanColumn, vx: ViewContext<Record<string, never>, 
     });
 }
 
-export function renderBoardPane(vx: ViewContext<Record<string, never>, KanbanApi>): Node {
+export function renderBoardPane(vx: ViewContext<Record<string, never>, KanbanApi, KanbanInternal>): Node {
     return element('Stack', {
         props: {
             class: 'kanban-pane kanban-board-pane',
@@ -367,7 +368,7 @@ export function renderBoardPane(vx: ViewContext<Record<string, never>, KanbanApi
                         props: { style: { display: 'flex', gap: '8px', 'align-items': 'center' } },
                         children: [
                             each(
-                                () => [vx.app.filterRevision()],
+                                () => [vx.internal.filterRevision()],
                                 (rev) => rev,
                                 () => element('Input', {
                                     props: {

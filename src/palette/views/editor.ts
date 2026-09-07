@@ -6,9 +6,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { PaletteApi } from '../contract.js';
+import type { PaletteApi, PaletteInternal } from '../contract.js';
 
-export function renderEditorView(vx: ViewContext<Record<string, never>, PaletteApi>): Node {
+export function renderEditorView(vx: ViewContext<Record<string, never>, PaletteApi, PaletteInternal>): Node {
     const quickColors: readonly string[] = [
         '#58a6ff',
         '#0969da',
@@ -93,7 +93,7 @@ export function renderEditorView(vx: ViewContext<Record<string, never>, PaletteA
                                         height: '32px',
                                         'border-radius': '6px',
                                         border: '1px solid var(--edge)',
-                                        background: vx.app.tokens()[vx.app.selectedToken()],
+                                        background: vx.internal.tokens()[vx.app.selectedToken()],
                                     }),
                                 },
                             }),
@@ -114,7 +114,7 @@ export function renderEditorView(vx: ViewContext<Record<string, never>, PaletteA
                                         'margin-left': '6px',
                                     },
                                 },
-                                children: [text(() => vx.app.tokens()[vx.app.selectedToken()])],
+                                children: [text(() => vx.internal.tokens()[vx.app.selectedToken()])],
                             }),
                         ],
                     }),
@@ -130,13 +130,13 @@ export function renderEditorView(vx: ViewContext<Record<string, never>, PaletteA
                                         children: [text('New Token Value:')],
                                     }),
                                     each(
-                                        () => [vx.app.draftRevision()],
+                                        () => [vx.internal.draftRevision()],
                                         (rev) => rev,
                                         () => element('Input', {
                                             props: {
                                                 class: 'input-token-value',
                                                 placeholder: 'e.g. #58a6ff or rgba(...)',
-                                                value: () => vx.app.draftValue(),
+                                                value: () => vx.internal.draftValue(),
                                                 style: { padding: '6px 8px', 'font-size': '13px' },
                                             },
                                             intents: { change: { action: command('palette.setDraftValue') } },

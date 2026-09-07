@@ -2,6 +2,7 @@ import {
     needs,
     provider,
     type ProviderToken,
+    type ReadonlySignal,
     type Signal,
 } from '@flybyme/mesh-web';
 
@@ -17,6 +18,35 @@ export interface LapItem {
 }
 
 export interface ClockApi {
+    // Current time
+    readonly currentTime: ReadonlySignal<string>;
+    readonly currentDate: ReadonlySignal<string>;
+    readonly timezone: ReadonlySignal<string>;
+    readonly is24Hour: ReadonlySignal<boolean>;
+    toggleFormat(): void;
+
+    // Stopwatch
+    readonly stopwatchFormatted: ReadonlySignal<string>;
+    readonly stopwatchRunning: ReadonlySignal<boolean>;
+    readonly stopwatchLaps: ReadonlySignal<readonly LapItem[]>;
+    readonly lapCount: () => number;
+    startStopwatch(): void;
+    stopStopwatch(): void;
+    resetStopwatch(): void;
+    lapStopwatch(): void;
+
+    // Countdown
+    readonly countdownFormatted: ReadonlySignal<string>;
+    readonly countdownSeconds: ReadonlySignal<number>;
+    readonly countdownRunning: ReadonlySignal<boolean>;
+    readonly countdownFinished: ReadonlySignal<boolean>;
+    startCountdown(): void;
+    pauseCountdown(): void;
+    resetCountdown(): void;
+    addCountdownSeconds(seconds: number): void;
+}
+
+export interface ClockInternal {
     // Current time
     readonly currentTime: Signal<string>;
     readonly currentDate: Signal<string>;

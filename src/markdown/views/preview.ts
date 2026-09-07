@@ -6,7 +6,7 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { MarkdownApi, MarkdownBlock, MarkdownSpan } from '../contract.js';
+import type { MarkdownApi, MarkdownBlock, MarkdownInternal, MarkdownSpan } from '../contract.js';
 
 function renderSpan(span: MarkdownSpan): Node {
     switch (span.type) {
@@ -186,7 +186,7 @@ function renderMarkdownBlock(block: MarkdownBlock): Node {
     }
 }
 
-export function renderPreviewPane(vx: ViewContext<Record<string, never>, MarkdownApi>): Node {
+export function renderPreviewPane(vx: ViewContext<Record<string, never>, MarkdownApi, MarkdownInternal>): Node {
     return element('Stack', {
         props: {
             class: 'markdown-pane markdown-preview-pane',

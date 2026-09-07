@@ -6,9 +6,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { ChartApi, ChartDataPoint } from '../contract.js';
+import type { ChartApi, ChartDataPoint, ChartInternal } from '../contract.js';
 
-export function renderDataEditorView(vx: ViewContext<Record<string, never>, ChartApi>): Node {
+export function renderDataEditorView(vx: ViewContext<Record<string, never>, ChartApi, ChartInternal>): Node {
     return element('Stack', {
         props: {
             class: 'chart-pane chart-data-pane',
@@ -45,13 +45,13 @@ export function renderDataEditorView(vx: ViewContext<Record<string, never>, Char
                                         children: [text('Category / Label:')],
                                     }),
                                     each(
-                                        () => [vx.app.draftRevision()],
+                                        () => [vx.internal.draftRevision()],
                                         (rev) => rev,
                                         () => element('Input', {
                                             props: {
                                                 placeholder: 'e.g. Jul, Q3, Sprint 4...',
                                                 class: 'input-point-label',
-                                                value: () => vx.app.draftLabel(),
+                                                value: () => vx.internal.draftLabel(),
                                                 style: {
                                                     padding: '8px',
                                                     'font-size': '13px',
@@ -77,14 +77,14 @@ export function renderDataEditorView(vx: ViewContext<Record<string, never>, Char
                                         children: [text('Value (number):')],
                                     }),
                                     each(
-                                        () => [vx.app.draftRevision()],
+                                        () => [vx.internal.draftRevision()],
                                         (rev) => rev,
                                         () => element('Input', {
                                             props: {
                                                 type: 'number',
                                                 placeholder: 'e.g. 85',
                                                 class: 'input-point-value',
-                                                value: () => vx.app.draftValue(),
+                                                value: () => vx.internal.draftValue(),
                                                 style: {
                                                     padding: '8px',
                                                     'font-size': '13px',

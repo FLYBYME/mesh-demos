@@ -1,5 +1,6 @@
 import {
     tiles,
+    type Api,
     type Application,
     type Context,
     type Json,
@@ -11,16 +12,23 @@ import {
     NEEDS,
     TODO,
     type TodoApi,
+    type TodoInternal,
     type TodoItem,
 } from './contract.js';
 import { renderTodosView } from './views/todos.js';
 import { renderStatsView } from './views/stats.js';
 
-export { TODO, type TodoApi, type TodoItem } from './contract.js';
+export { TODO, type TodoApi, type TodoInternal, type TodoItem } from './contract.js';
 
 // ---------------------------------------------------------------------------- application
 
-export default class TodoApp implements Application<typeof NEEDS, readonly [], typeof TODO> {
+export default class TodoApp implements Application<
+    typeof NEEDS,
+    readonly [],
+    typeof TODO,
+    Api<Record<string, never>>,
+    TodoInternal
+> {
     readonly needs = NEEDS;
     readonly provides = TODO;
 
@@ -49,7 +57,7 @@ export default class TodoApp implements Application<typeof NEEDS, readonly [], t
         ],
     });
 
-    readonly views: readonly ViewDecl<never, never>[] = [
+    readonly views: readonly ViewDecl<never, never, never>[] = [
         {
             id: 'todos',
             title: 'Todo List',
@@ -57,7 +65,7 @@ export default class TodoApp implements Application<typeof NEEDS, readonly [], t
             instances: 'one',
             defaultSize: { width: 440, height: 500 },
             minSize: { width: 320, height: 260 },
-            render(vx: ViewContext<Record<string, never>, TodoApi>): Node {
+            render(vx: ViewContext<Record<string, never>, TodoApi, TodoInternal>): Node {
                 return renderTodosView(vx);
             },
         },
@@ -68,13 +76,16 @@ export default class TodoApp implements Application<typeof NEEDS, readonly [], t
             instances: 'one',
             defaultSize: { width: 320, height: 420 },
             minSize: { width: 240, height: 220 },
-            render(vx: ViewContext<Record<string, never>, TodoApi>): Node {
+            render(vx: ViewContext<Record<string, never>, TodoApi, TodoInternal>): Node {
                 return renderStatsView(vx);
             },
         },
     ];
 
-    async start(cx: Context<typeof NEEDS, readonly []>): Promise<TodoApi> {
+    async start(cx: Context<typeof NEEDS, readonly []>): Promise<{
+        readonly api: TodoApi;
+        readonly internal: TodoInternal;
+    }> {
         cx.log.info('TodoApp starting');
 
         const items = cx.state.signal<readonly TodoItem[]>([]);
@@ -160,7 +171,18 @@ export default class TodoApp implements Application<typeof NEEDS, readonly [], t
             }
         });
 
-        return {
+        const api: TodoApi = {
+            items,
+            totalCount,
+            outstandingCount,
+            completedCount,
+            add,
+            toggle,
+            remove,
+            clearCompleted,
+        };
+
+        const internal: TodoInternal = {
             items,
             draft,
             draftRevision,
@@ -175,5 +197,7 @@ export default class TodoApp implements Application<typeof NEEDS, readonly [], t
             markAllDone,
             markAllActive,
         };
+
+        return { api, internal };
     }
 }

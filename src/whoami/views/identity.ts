@@ -7,9 +7,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { WhoamiApi } from '../contract.js';
+import type { WhoamiApi, WhoamiInternal } from '../contract.js';
 
-export function renderIdentityView(vx: ViewContext<Record<string, never>, WhoamiApi>): Node {
+export function renderIdentityView(vx: ViewContext<Record<string, never>, WhoamiApi, WhoamiInternal>): Node {
     return element('Stack', {
         props: {
             class: 'whoami-pane whoami-identity-pane',
@@ -191,13 +191,13 @@ export function renderIdentityView(vx: ViewContext<Record<string, never>, Whoami
                                         children: [text('Sign In via Auth Extension')],
                                     }),
                                     when(
-                                        () => vx.app.authError() !== null,
+                                        () => vx.internal.authError() !== null,
                                         () => element('Text', {
                                             props: {
                                                 class: 'auth-error-text',
                                                 style: { color: '#f85149', 'font-size': '13px' },
                                             },
-                                            children: [text(() => vx.app.authError() ?? '')],
+                                            children: [text(() => vx.internal.authError() ?? '')],
                                         }),
                                     ),
                                     element('Form', {
@@ -215,7 +215,7 @@ export function renderIdentityView(vx: ViewContext<Record<string, never>, Whoami
                                                         children: [text('Email Address')],
                                                     }),
                                                     each(
-                                                        () => [vx.app.draftRevision()],
+                                                        () => [vx.internal.draftRevision()],
                                                         (rev) => rev,
                                                         () => element('Input', {
                                                             props: {
@@ -243,7 +243,7 @@ export function renderIdentityView(vx: ViewContext<Record<string, never>, Whoami
                                                         children: [text('Password')],
                                                     }),
                                                     each(
-                                                        () => [vx.app.draftRevision()],
+                                                        () => [vx.internal.draftRevision()],
                                                         (rev) => rev,
                                                         () => element('Input', {
                                                             props: {

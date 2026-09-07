@@ -2,6 +2,7 @@ import {
     needs,
     provider,
     type ProviderToken,
+    type ReadonlySignal,
     type Signal,
 } from '@flybyme/mesh-web';
 
@@ -16,6 +17,20 @@ export interface Note {
 }
 
 export interface NotesApi {
+    readonly notes: ReadonlySignal<readonly Note[]>;
+    readonly filterText: ReadonlySignal<string>;
+    readonly selectedId: ReadonlySignal<string | null>;
+    readonly selectedNote: () => Note | null;
+    readonly totalCount: () => number;
+    readonly totalWords: () => number;
+
+    createNote(title: string, body: string): void;
+    updateNote(id: string, title: string, body: string): void;
+    deleteNote(id: string): void;
+    selectNote(id: string | null): void;
+}
+
+export interface NotesInternal {
     readonly notes: Signal<readonly Note[]>;
     readonly filterText: Signal<string>;
     readonly filterRevision: Signal<number>;
@@ -28,6 +43,7 @@ export interface NotesApi {
     readonly totalCount: () => number;
     readonly filteredCount: () => number;
     readonly totalWords: () => number;
+
     createNote(title: string, body: string): void;
     updateNote(id: string, title: string, body: string): void;
     deleteNote(id: string): void;

@@ -3,6 +3,7 @@ import {
     provider,
     type ChromeWindow,
     type ProviderToken,
+    type ReadonlySignal,
     type Signal,
     type WindowMode,
 } from '@flybyme/mesh-web';
@@ -30,6 +31,25 @@ export interface TerminalSession {
 }
 
 export interface WorkbenchApi {
+    readonly documents: ReadonlySignal<readonly WorkbenchDocument[]>;
+    readonly terminals: ReadonlySignal<readonly TerminalSession[]>;
+
+    openFile(fileId: string): string;
+    openTerminal(session?: string): string;
+    openExplorer(): string;
+    openInspector(): string;
+    openMonitor(): string;
+
+    createFile(path: string, content?: string): string;
+    saveDoc(fileId: string): void;
+    revertDoc(fileId: string): void;
+    updateDocContent(fileId: string, content: string): void;
+
+    runTerminalCommand(session: string, cmd: string): void;
+    clearTerminal(session: string): void;
+}
+
+export interface WorkbenchInternal {
     readonly documents: Signal<readonly WorkbenchDocument[]>;
     readonly terminals: Signal<readonly TerminalSession[]>;
     readonly activeFileId: Signal<string>;

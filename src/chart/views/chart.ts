@@ -7,9 +7,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { ChartApi, ChartDataPoint } from '../contract.js';
+import type { ChartApi, ChartDataPoint, ChartInternal } from '../contract.js';
 
-function renderVerticalChart(vx: ViewContext<Record<string, never>, ChartApi>): Node {
+function renderVerticalChart(vx: ViewContext<Record<string, never>, ChartApi, ChartInternal>): Node {
     const series = vx.app.activeSeries();
     const max = vx.app.maxValue() || 1;
 
@@ -97,7 +97,7 @@ function renderVerticalChart(vx: ViewContext<Record<string, never>, ChartApi>): 
     });
 }
 
-function renderHorizontalChart(vx: ViewContext<Record<string, never>, ChartApi>): Node {
+function renderHorizontalChart(vx: ViewContext<Record<string, never>, ChartApi, ChartInternal>): Node {
     const series = vx.app.activeSeries();
     const max = vx.app.maxValue() || 1;
 
@@ -190,7 +190,7 @@ function renderHorizontalChart(vx: ViewContext<Record<string, never>, ChartApi>)
     });
 }
 
-export function renderChartView(vx: ViewContext<Record<string, never>, ChartApi>): Node {
+export function renderChartView(vx: ViewContext<Record<string, never>, ChartApi, ChartInternal>): Node {
     return element('Stack', {
         props: {
             class: 'chart-pane chart-visualizer-pane',

@@ -20,6 +20,7 @@ import {
     NEEDS,
     WHOAMI,
     type WhoamiApi,
+    type WhoamiInternal,
 } from './contract.js';
 import { renderIdentityView } from './views/identity.js';
 import { renderOrganizationsView } from './views/organizations.js';
@@ -29,11 +30,12 @@ export {
     type IdentityWhoamiOutput,
     type IdentityWhoamiOutputOrganization,
     type WhoamiApi,
+    type WhoamiInternal,
 } from './contract.js';
 
 // ---------------------------------------------------------------------------- application
 
-export default class WhoamiApp implements Application<typeof NEEDS, typeof CONSUMES, typeof WHOAMI> {
+export default class WhoamiApp implements Application<typeof NEEDS, typeof CONSUMES, typeof WHOAMI, Record<string, never>, WhoamiInternal> {
     readonly needs = NEEDS;
     readonly consumes = CONSUMES;
     readonly provides = WHOAMI;
@@ -47,7 +49,7 @@ export default class WhoamiApp implements Application<typeof NEEDS, typeof CONSU
         ],
     });
 
-    readonly views: readonly ViewDecl<Record<string, never>, WhoamiApi>[] = [
+    readonly views: readonly ViewDecl<Record<string, never>, WhoamiApi, WhoamiInternal>[] = [
         {
             id: 'identity',
             title: 'Platform Identity',
@@ -55,7 +57,7 @@ export default class WhoamiApp implements Application<typeof NEEDS, typeof CONSU
             instances: 'one',
             defaultSize: { width: 440, height: 480 },
             minSize: { width: 300, height: 320 },
-            render(vx: ViewContext<Record<string, never>, WhoamiApi>): Node {
+            render(vx: ViewContext<Record<string, never>, WhoamiApi, WhoamiInternal>): Node {
                 return renderIdentityView(vx);
             },
         },
@@ -66,7 +68,7 @@ export default class WhoamiApp implements Application<typeof NEEDS, typeof CONSU
             instances: 'one',
             defaultSize: { width: 420, height: 480 },
             minSize: { width: 300, height: 320 },
-            render(vx: ViewContext<Record<string, never>, WhoamiApi>): Node {
+            render(vx: ViewContext<Record<string, never>, WhoamiApi, WhoamiInternal>): Node {
                 return renderOrganizationsView(vx);
             },
         },
@@ -88,7 +90,7 @@ export default class WhoamiApp implements Application<typeof NEEDS, typeof CONSU
         { command: 'whoami.openOrganizations', keys: 'ctrl+o' },
     ];
 
-    async start(cx: Context<typeof NEEDS, typeof CONSUMES, typeof whoamiApi>): Promise<WhoamiApi> {
+    async start(cx: Context<typeof NEEDS, typeof CONSUMES, typeof whoamiApi>): Promise<{ api: WhoamiApi; internal: WhoamiInternal }> {
         cx.log.info('WhoamiApp starting');
 
         // Optional auth Extension integration
@@ -273,7 +275,25 @@ export default class WhoamiApp implements Application<typeof NEEDS, typeof CONSU
             return current.organizations.find((o) => o.organizationId === activeId) ?? null;
         });
 
-        return {
+        const api: WhoamiApi = {
+            status,
+            user,
+            errorMessage,
+            activeOrganizationId,
+            hasAuthExtension,
+            displayName,
+            email,
+            userId,
+            roles,
+            organizations,
+            activeOrganization,
+            refresh: fetchWhoami,
+            switchOrganization,
+            signIn,
+            signOut,
+        };
+
+        const internal: WhoamiInternal = {
             status,
             user,
             errorMessage,
@@ -294,5 +314,7 @@ export default class WhoamiApp implements Application<typeof NEEDS, typeof CONSU
             signIn,
             signOut,
         };
+
+        return { api, internal };
     }
 }

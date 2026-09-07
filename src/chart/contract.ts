@@ -2,6 +2,7 @@ import {
     needs,
     provider,
     type ProviderToken,
+    type ReadonlySignal,
     type Signal,
 } from '@flybyme/mesh-web';
 
@@ -22,6 +23,22 @@ export interface ChartSeries {
 }
 
 export interface ChartApi {
+    readonly seriesList: ReadonlySignal<readonly ChartSeries[]>;
+    readonly activeSeriesId: ReadonlySignal<string>;
+    readonly chartOrientation: ReadonlySignal<'vertical' | 'horizontal'>;
+
+    readonly activeSeries: () => ChartSeries;
+    readonly maxValue: () => number;
+    readonly minValue: () => number;
+    readonly averageValue: () => number;
+    readonly totalValue: () => number;
+
+    selectSeries(seriesId: string): void;
+    addDataPoint(label: string, value: number): void;
+    deleteDataPoint(pointId: string): void;
+}
+
+export interface ChartInternal {
     readonly seriesList: Signal<readonly ChartSeries[]>;
     readonly activeSeriesId: Signal<string>;
     readonly chartOrientation: Signal<'vertical' | 'horizontal'>;

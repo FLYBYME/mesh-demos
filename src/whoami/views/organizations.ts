@@ -7,9 +7,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { IdentityWhoamiOutputOrganization, WhoamiApi } from '../contract.js';
+import type { IdentityWhoamiOutputOrganization, WhoamiApi, WhoamiInternal } from '../contract.js';
 
-export function renderOrganizationsView(vx: ViewContext<Record<string, never>, WhoamiApi>): Node {
+export function renderOrganizationsView(vx: ViewContext<Record<string, never>, WhoamiApi, WhoamiInternal>): Node {
     return element('Stack', {
         props: {
             class: 'whoami-pane whoami-orgs-pane',

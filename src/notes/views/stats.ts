@@ -5,9 +5,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { NotesApi } from '../contract.js';
+import type { NotesApi, NotesInternal } from '../contract.js';
 
-export function renderStatsView(vx: ViewContext<Record<string, never>, NotesApi>): Node {
+export function renderStatsView(vx: ViewContext<Record<string, never>, NotesApi, NotesInternal>): Node {
     return element('Stack', {
         props: {
             class: 'notes-pane notes-stats-pane',
@@ -54,7 +54,7 @@ export function renderStatsView(vx: ViewContext<Record<string, never>, NotesApi>
                             element('Text', { children: [text('Matching filter:')] }),
                             element('Badge', {
                                 props: { class: 'badge stat-filtered-count' },
-                                children: [text(() => String(vx.app.filteredCount()))],
+                                children: [text(() => String(vx.internal.filteredCount()))],
                             }),
                         ],
                     }),
