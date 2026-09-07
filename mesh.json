@@ -65,7 +65,7 @@
         {
             "kind": "application",
             "id": "palette",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "entry": "src/palette/index.ts",
             "requiredParts": [
                 {

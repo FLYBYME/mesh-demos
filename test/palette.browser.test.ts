@@ -3,7 +3,7 @@ import { userEvent } from '@vitest/browser/context';
 import { mountPart, cleanup } from '@flybyme/mesh-web/testing';
 import ThemeExtension from '../src/theme/index.js';
 import PaletteApp, { PALETTE } from '../src/palette/index.js';
-import { THEME_TOKEN, THEME_TOKEN_NAMES } from '../src/shared/theme.js';
+import { THEME_TOKEN, THEME_TOKEN_NAMES } from '../src/contracts/theme.js';
 
 describe('PaletteApp browser tests', () => {
     afterEach(() => {
