@@ -1,5 +1,6 @@
 import {
     tiles,
+    type Api,
     type Application,
     type CommandDecl,
     type Context,
@@ -13,6 +14,7 @@ import {
     CLOCK,
     NEEDS,
     type ClockApi,
+    type ClockInternal,
     type LapItem,
 } from './contract.js';
 import {
@@ -26,11 +28,17 @@ import { renderTimeView } from './views/time.js';
 import { renderStopwatchView } from './views/stopwatch.js';
 import { renderCountdownView } from './views/countdown.js';
 
-export { CLOCK, type ClockApi, type LapItem } from './contract.js';
+export { CLOCK, type ClockApi, type ClockInternal, type LapItem } from './contract.js';
 
 // ---------------------------------------------------------------------------- application
 
-export default class ClockApp implements Application<typeof NEEDS, readonly [], typeof CLOCK> {
+export default class ClockApp implements Application<
+    typeof NEEDS,
+    readonly [],
+    typeof CLOCK,
+    Api<Record<string, never>>,
+    ClockInternal
+> {
     readonly needs = NEEDS;
     readonly provides = CLOCK;
 
@@ -65,7 +73,7 @@ export default class ClockApp implements Application<typeof NEEDS, readonly [], 
         ],
     });
 
-    readonly views: readonly ViewDecl<Record<string, never>, ClockApi>[] = [
+    readonly views: readonly ViewDecl<Record<string, never>, ClockApi, ClockInternal>[] = [
         {
             id: 'time',
             title: 'Current Time',
@@ -73,7 +81,7 @@ export default class ClockApp implements Application<typeof NEEDS, readonly [], 
             instances: 'one',
             defaultSize: { width: 440, height: 360 },
             minSize: { width: 300, height: 240 },
-            render(vx: ViewContext<Record<string, never>, ClockApi>): Node {
+            render(vx: ViewContext<Record<string, never>, ClockApi, ClockInternal>): Node {
                 return renderTimeView(vx);
             },
         },
@@ -84,7 +92,7 @@ export default class ClockApp implements Application<typeof NEEDS, readonly [], 
             instances: 'one',
             defaultSize: { width: 380, height: 460 },
             minSize: { width: 280, height: 260 },
-            render(vx: ViewContext<Record<string, never>, ClockApi>): Node {
+            render(vx: ViewContext<Record<string, never>, ClockApi, ClockInternal>): Node {
                 return renderStopwatchView(vx);
             },
         },
@@ -95,7 +103,7 @@ export default class ClockApp implements Application<typeof NEEDS, readonly [], 
             instances: 'one',
             defaultSize: { width: 380, height: 420 },
             minSize: { width: 280, height: 260 },
-            render(vx: ViewContext<Record<string, never>, ClockApi>): Node {
+            render(vx: ViewContext<Record<string, never>, ClockApi, ClockInternal>): Node {
                 return renderCountdownView(vx);
             },
         },
@@ -105,7 +113,10 @@ export default class ClockApp implements Application<typeof NEEDS, readonly [], 
     private stopwatchIntervalId: number | undefined;
     private countdownIntervalId: number | undefined;
 
-    async start(cx: Context<typeof NEEDS, readonly []>): Promise<ClockApi> {
+    async start(cx: Context<typeof NEEDS, readonly []>): Promise<{
+        readonly api: ClockApi;
+        readonly internal: ClockInternal;
+    }> {
         cx.log.info('ClockApp starting');
 
         // Current Time state
@@ -355,7 +366,31 @@ export default class ClockApp implements Application<typeof NEEDS, readonly [], 
             }
         });
 
-        return {
+        const api: ClockApi = {
+            currentTime,
+            currentDate,
+            timezone,
+            is24Hour,
+            toggleFormat,
+            stopwatchFormatted,
+            stopwatchRunning,
+            stopwatchLaps,
+            lapCount,
+            startStopwatch,
+            stopStopwatch,
+            resetStopwatch,
+            lapStopwatch,
+            countdownFormatted,
+            countdownSeconds,
+            countdownRunning,
+            countdownFinished,
+            startCountdown,
+            pauseCountdown,
+            resetCountdown,
+            addCountdownSeconds,
+        };
+
+        const internal: ClockInternal = {
             currentTime,
             currentDate,
             timezone,
@@ -381,6 +416,8 @@ export default class ClockApp implements Application<typeof NEEDS, readonly [], 
             setInputMinutes,
             applyMinutes,
         };
+
+        return { api, internal };
     }
 
     async stop(): Promise<void> {

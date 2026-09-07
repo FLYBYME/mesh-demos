@@ -7,9 +7,9 @@ import {
     type Node,
     type ViewContext,
 } from '@flybyme/mesh-web';
-import type { ClockApi } from '../contract.js';
+import type { ClockApi, ClockInternal } from '../contract.js';
 
-export function renderCountdownView(vx: ViewContext<Record<string, never>, ClockApi>): Node {
+export function renderCountdownView(vx: ViewContext<Record<string, never>, ClockApi, ClockInternal>): Node {
     return element('Stack', {
         props: {
             class: 'clock-pane countdown-pane',
@@ -117,7 +117,7 @@ export function renderCountdownView(vx: ViewContext<Record<string, never>, Clock
                         props: { style: { display: 'flex', gap: '8px', 'align-items': 'center' } },
                         children: [
                             each(
-                                () => [vx.app.countdownInputRevision()],
+                                () => [vx.internal.countdownInputRevision()],
                                 (rev) => rev,
                                 () => element('Input', {
                                     props: {
