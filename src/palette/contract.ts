@@ -3,6 +3,7 @@ import {
     needs,
     provider,
     type ProviderToken,
+    type ReadonlySignal,
     type Signal,
 } from '@flybyme/mesh-web';
 import {
@@ -15,6 +16,12 @@ import {
 // ---------------------------------------------------------------------------- contract & API
 
 export interface PaletteApi {
+    readonly selectedToken: ReadonlySignal<ThemeTokenName>;
+    readonly activeMode: () => ThemeMode;
+    selectToken(token: ThemeTokenName): void;
+}
+
+export interface PaletteInternal {
     readonly selectedToken: Signal<ThemeTokenName>;
     readonly draftValue: Signal<string>;
     readonly draftRevision: Signal<number>;
