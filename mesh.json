@@ -123,7 +123,7 @@
         {
             "kind": "application",
             "id": "kanban",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "entry": "src/kanban/index.ts",
             "description": "A board of columns and cards you can move between them.",
             "keywords": [
