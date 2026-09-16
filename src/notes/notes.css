@@ -1,0 +1,278 @@
+/**
+ * Styling for the Notes demo application.
+ */
+
+.notes-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 16px;
+    background: var(--mesh-bg-canvas, #0d1117);
+    color: var(--mesh-fg-default, #c9d1d9);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    gap: 14px;
+    user-select: none;
+}
+
+/* Header & Nav */
+.notes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notes-nav {
+    display: flex;
+    gap: 4px;
+    background: var(--mesh-bg-subtle, #161b22);
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--mesh-border-default, #30363d);
+}
+
+.notes-nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--mesh-fg-muted, #8b949e);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.notes-nav-btn:hover {
+    color: var(--mesh-fg-default, #c9d1d9);
+    background: var(--mesh-bg-hover, #21262d);
+}
+
+.notes-nav-btn.active {
+    background: var(--mesh-bg-active, #30363d);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Master-Detail Layout */
+.notes-workspace {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    min-height: 0;
+}
+
+.notes-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 240px;
+    gap: 10px;
+    min-height: 0;
+}
+
+.notes-search-row {
+    display: flex;
+    gap: 6px;
+}
+
+.notes-search-input {
+    flex: 1;
+    background: var(--mesh-bg-subtle, #161b22);
+    border: 1px solid var(--mesh-border-default, #30363d);
+    border-radius: 6px;
+    color: var(--mesh-fg-default, #f0f6fc);
+    font-size: 13px;
+    padding: 6px 10px;
+    outline: none;
+}
+
+.notes-search-input:focus {
+    border-color: #58a6ff;
+}
+
+.notes-btn-new {
+    background: #238636;
+    color: #ffffff;
+    border: 1px solid #2ea043;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    white-space: nowrap;
+}
+
+.notes-btn-new:hover {
+    background: #2ea043;
+}
+
+.notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 2px;
+}
+
+.notes-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--mesh-bg-subtle, #161b22);
+    border: 1px solid var(--mesh-border-default, #30363d);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    gap: 4px;
+    transition: all 0.15s ease;
+}
+
+.notes-card:hover {
+    background: var(--mesh-bg-hover, #21262d);
+    border-color: #484f58;
+}
+
+.notes-card.selected {
+    border-color: #58a6ff;
+    background: rgba(56, 139, 253, 0.1);
+}
+
+.notes-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--mesh-fg-default, #f0f6fc);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.notes-card-snippet {
+    font-size: 12px;
+    color: var(--mesh-fg-muted, #8b949e);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.notes-card-date {
+    font-size: 11px;
+    color: var(--mesh-fg-subtle, #6e7681);
+    align-self: flex-end;
+}
+
+.notes-empty-list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    color: var(--mesh-fg-muted, #8b949e);
+    font-size: 13px;
+    font-style: italic;
+    text-align: center;
+}
+
+/* Editor Pane */
+.notes-editor {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background: var(--mesh-bg-subtle, #161b22);
+    border: 1px solid var(--mesh-border-default, #30363d);
+    border-radius: 8px;
+    padding: 14px;
+    gap: 12px;
+    min-height: 0;
+}
+
+.notes-editor-title {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--mesh-border-default, #30363d);
+    color: var(--mesh-fg-default, #f0f6fc);
+    font-size: 18px;
+    font-weight: 600;
+    padding: 4px 0 8px 0;
+    outline: none;
+}
+
+.notes-editor-title:focus {
+    border-bottom-color: #58a6ff;
+}
+
+.notes-editor-body {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--mesh-fg-default, #c9d1d9);
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    outline: none;
+    resize: none;
+    padding: 0;
+}
+
+.notes-editor-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--mesh-border-default, #30363d);
+    padding-top: 10px;
+}
+
+.notes-btn-save {
+    background: #1f6feb;
+    color: #ffffff;
+    border: 1px solid #388bfd;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.notes-btn-save:hover {
+    background: #388bfd;
+}
+
+.notes-btn-delete {
+    background: transparent;
+    color: #f85149;
+    border: 1px solid rgba(248, 81, 73, 0.4);
+    border-radius: 6px;
+    font-size: 13px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.notes-btn-delete:hover {
+    background: rgba(248, 81, 73, 0.15);
+    border-color: #f85149;
+}
+
+/* Stats View */
+.notes-stats-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--mesh-bg-subtle, #161b22);
+    border: 1px solid var(--mesh-border-default, #30363d);
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.notes-metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+.notes-metric-value {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--mesh-fg-default, #f0f6fc);
+}

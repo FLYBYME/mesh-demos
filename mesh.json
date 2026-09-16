@@ -43,6 +43,21 @@
             ],
             "license": "UNLICENSED",
             "homepage": "https://github.com/FLYBYME/mesh-demos"
+        },
+        {
+            "kind": "application",
+            "id": "notes",
+            "version": "0.3.0",
+            "entry": "src/notes/index.ts",
+            "description": "Write, edit, search, and manage notes with live word statistics.",
+            "keywords": [
+                "notes",
+                "writing",
+                "markdown",
+                "productivity"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         }
     ]
 }
