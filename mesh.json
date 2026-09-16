@@ -122,6 +122,21 @@
             ],
             "license": "UNLICENSED",
             "homepage": "https://github.com/FLYBYME/mesh-demos"
+        },
+        {
+            "kind": "application",
+            "id": "kanban",
+            "version": "0.3.0",
+            "entry": "src/kanban/index.ts",
+            "description": "A board of columns and cards you can move between them.",
+            "keywords": [
+                "tasks",
+                "planning",
+                "kanban",
+                "productivity"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         }
     ]
 }
