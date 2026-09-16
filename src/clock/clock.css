@@ -1,0 +1,208 @@
+/**
+ * Styles for the clock demo views.
+ */
+
+.clock-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+    font-family: var(--mesh-font-family, system-ui, -apple-system, sans-serif);
+    color: var(--mesh-color-text, #e6edf3);
+    background: var(--mesh-color-bg, #0d1117);
+}
+
+.clock-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.clock-nav {
+    display: flex;
+    gap: 8px;
+}
+
+.clock-nav-btn {
+    background: var(--mesh-color-surface, #21262d);
+    color: var(--mesh-color-text, #e6edf3);
+    border: 1px solid var(--mesh-color-border, #30363d);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.clock-nav-btn:hover {
+    background: var(--mesh-color-surface-hover, #30363d);
+    border-color: var(--mesh-color-border-hover, #8b949e);
+}
+
+.clock-nav-btn.active {
+    background: var(--mesh-color-primary, #1f6feb);
+    color: #ffffff;
+    border-color: var(--mesh-color-primary, #1f6feb);
+}
+
+/* Big digital displays */
+.clock-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    text-align: center;
+}
+
+.clock-digits {
+    font-family: var(--mesh-font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+    font-size: 64px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    color: var(--mesh-color-text, #e6edf3);
+    user-select: none;
+}
+
+.clock-ampm {
+    font-size: 24px;
+    font-weight: 500;
+    margin-left: 8px;
+    color: var(--mesh-color-text-secondary, #8b949e);
+}
+
+.clock-ms {
+    font-size: 36px;
+    color: var(--mesh-color-primary, #58a6ff);
+}
+
+.clock-date {
+    font-size: 18px;
+    color: var(--mesh-color-text-secondary, #8b949e);
+    margin-top: 12px;
+}
+
+.clock-controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.clock-btn {
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--mesh-color-border, #30363d);
+    background: var(--mesh-color-surface, #21262d);
+    color: var(--mesh-color-text, #e6edf3);
+    transition: all 0.15s ease;
+}
+
+.clock-btn:hover {
+    background: var(--mesh-color-surface-hover, #30363d);
+}
+
+.clock-btn-primary {
+    background: #238636;
+    border-color: rgba(240, 246, 252, 0.1);
+    color: #ffffff;
+}
+
+.clock-btn-primary:hover {
+    background: #2ea043;
+}
+
+.clock-btn-danger {
+    background: #da3633;
+    border-color: rgba(240, 246, 252, 0.1);
+    color: #ffffff;
+}
+
+.clock-btn-danger:hover {
+    background: #f85149;
+}
+
+.clock-btn-subtle {
+    background: transparent;
+    border-color: var(--mesh-color-border, #30363d);
+    color: var(--mesh-color-text-secondary, #8b949e);
+}
+
+.clock-btn-subtle:hover {
+    color: var(--mesh-color-text, #e6edf3);
+    border-color: var(--mesh-color-border-hover, #8b949e);
+}
+
+/* Laps table */
+.clock-laps-container {
+    max-height: 180px;
+    overflow-y: auto;
+    margin-top: 20px;
+    border-top: 1px solid var(--mesh-color-border, #30363d);
+    padding-top: 12px;
+}
+
+.clock-lap-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 12px;
+    font-family: var(--mesh-font-mono, monospace);
+    font-size: 13px;
+    border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+}
+
+.clock-lap-number {
+    color: var(--mesh-color-text-secondary, #8b949e);
+}
+
+.clock-lap-split {
+    font-weight: 600;
+    color: var(--mesh-color-text, #e6edf3);
+}
+
+.clock-lap-total {
+    color: var(--mesh-color-text-secondary, #8b949e);
+}
+
+/* Preset buttons */
+.clock-presets {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.clock-preset-btn {
+    background: var(--mesh-color-surface, #21262d);
+    border: 1px solid var(--mesh-color-border, #30363d);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--mesh-color-text-secondary, #8b949e);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.clock-preset-btn:hover {
+    background: var(--mesh-color-surface-hover, #30363d);
+    color: var(--mesh-color-text, #e6edf3);
+}
+
+.clock-timer-alert {
+    margin-top: 16px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    background: rgba(218, 54, 51, 0.15);
+    border: 1px solid #da3633;
+    color: #f85149;
+    font-size: 14px;
+    font-weight: 600;
+}
