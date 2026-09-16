@@ -100,6 +100,8 @@ export default class ClockApp implements Application<
     async start(
         cx: Context<typeof NEEDS, typeof CONSUMES, typeof clockApi>,
     ): Promise<{ api: PartApi; internal: ClockInternal }> {
+        // @ts-ignore
+        window.cx = cx;
         // ------------------------------------------------------------------ 1. Live Clock
         const time = cx.state.signal(new Date());
         const is24Hour = cx.state.signal(false);
