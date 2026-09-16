@@ -58,6 +58,21 @@
             ],
             "license": "UNLICENSED",
             "homepage": "https://github.com/FLYBYME/mesh-demos"
+        },
+        {
+            "kind": "application",
+            "id": "markdown",
+            "version": "0.3.0",
+            "entry": "src/markdown/index.ts",
+            "description": "Live markdown editor, previewer, and syntax generator.",
+            "keywords": [
+                "markdown",
+                "writing",
+                "editor",
+                "preview"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         }
     ]
 }
