@@ -73,6 +73,20 @@
             ],
             "license": "UNLICENSED",
             "homepage": "https://github.com/FLYBYME/mesh-demos"
+        },
+        {
+            "kind": "extension",
+            "id": "theme",
+            "version": "0.3.0",
+            "entry": "src/theme/index.ts",
+            "description": "Dynamic CSS tokens and theme presets: dark, light, high-contrast, and custom overrides.",
+            "keywords": [
+                "theme",
+                "appearance",
+                "styles"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         }
     ]
 }
