@@ -108,6 +108,20 @@
             ],
             "license": "UNLICENSED",
             "homepage": "https://github.com/FLYBYME/mesh-demos"
+        },
+        {
+            "kind": "application",
+            "id": "chart",
+            "version": "0.3.0",
+            "entry": "src/chart/index.ts",
+            "description": "Enter numbers, see bars. Multiple series, switchable projections.",
+            "keywords": [
+                "data",
+                "charts",
+                "visualization"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         }
     ]
 }
