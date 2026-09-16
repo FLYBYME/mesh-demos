@@ -87,6 +87,27 @@
             ],
             "license": "UNLICENSED",
             "homepage": "https://github.com/FLYBYME/mesh-demos"
+        },
+        {
+            "kind": "application",
+            "id": "palette",
+            "version": "0.3.0",
+            "entry": "src/palette/index.ts",
+            "requiredParts": [
+                {
+                    "id": "theme",
+                    "version": "^0.3.0"
+                }
+            ],
+            "description": "Inspect and edit every theme token live with real-time preview.",
+            "keywords": [
+                "theme",
+                "palette",
+                "color",
+                "developer"
+            ],
+            "license": "UNLICENSED",
+            "homepage": "https://github.com/FLYBYME/mesh-demos"
         }
     ]
 }

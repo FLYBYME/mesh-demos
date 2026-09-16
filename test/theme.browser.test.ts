@@ -1,4 +1,4 @@
-import { describe, expect, it, afterEach } from 'vitest';
+import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import { mountPart, cleanup } from '@flybyme/mesh-web/testing';
 import { memoryProvider } from '@flybyme/mesh-web';
 import ThemeExtension from '../src/theme/index.js';
@@ -11,8 +11,13 @@ import {
 } from '../src/contracts/theme.js';
 
 describe('ThemeExtension browser tests', () => {
+    beforeEach(() => {
+        localStorage.clear();
+    });
+
     afterEach(() => {
         cleanup();
+        localStorage.clear();
         document.body.innerHTML = '';
         for (const name of THEME_TOKEN_NAMES) {
             document.documentElement.style.removeProperty(name);
